@@ -4,7 +4,7 @@
     <el-container>
       <el-aside width="200px">Aside</el-aside>
       <el-container>
-        <el-main>Main</el-main>
+        <el-main></el-main>
         <el-footer>Footer</el-footer>
       </el-container>
     </el-container>
@@ -14,13 +14,32 @@
 <script>
 // @ is an alias to /src
 // import Header from "@/components/header.vue";
-
+// import TVChartContainer from "@/components/TVChartContainer.vue";
+import { OHLCV } from '@/apis/cryptocompare'
 export default {
-  name: "Home",
+  name: 'Home',
   components: {
+    // TVChartContainer,
     // Header,
   },
-};
+  mounted() {
+    return OHLCV(
+      {
+        fsym: 'BTC',
+        tsym: 'USD',
+        limit: 10,
+      },
+      'histoday'
+    )
+      .then(({ data }) => {
+        const { Data } = data
+        console.log(Data)
+      })
+      .catch((e) => {
+        console.log(e)
+      })
+  },
+}
 </script>
 <style lang="scss" scoped>
 .el-header,
