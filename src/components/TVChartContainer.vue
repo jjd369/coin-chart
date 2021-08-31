@@ -3,26 +3,21 @@
 </template>
 
 <script>
-import { OHLCV } from '@/apis/cryptocompare'
 import { widget } from '../../public/charting_library'
-
+import Datafeed from '@/apis/tradingveiw'
 export default {
   name: 'TVChartContainer',
   props: {
     symbol: {
-      default: 'AAPL',
+      default: 'BTC/USD',
       type: String,
     },
     interval: {
-      default: 'D',
+      default: '60',
       type: String,
     },
     containerId: {
       default: 'tv_chart_container',
-      type: String,
-    },
-    datafeedUrl: {
-      default: 'https://demo_feed.tradingview.com',
       type: String,
     },
     libraryPath: {
@@ -59,14 +54,15 @@ export default {
   },
   tvWidget: null,
   mounted() {
+    console.log(Datafeed)
     const widgetOptions = {
       symbol: this.symbol,
       // BEWARE: no trailing slash is expected in feed URL
-      datafeed: new window.Datafeeds.UDFCompatibleDatafeed(this.datafeedUrl),
+      datafeed: Datafeed,
       interval: this.interval,
-      container_id: this.containerId,
+      container: this.containerId,
       library_path: this.libraryPath,
-      locale: getLanguageFromURL() || 'en',
+      locale: 'ko',
       disabled_features: ['use_localstorage_for_settings'],
       enabled_features: ['study_templates'],
       charts_storage_url: this.chartsStorageUrl,
@@ -99,23 +95,24 @@ export default {
     })
   },
   methods: {
-    async test() {
-      const Data = await OHLCV({
-        fsym: 'BTC',
-        tsym: 'USD',
-        limit: 10,
-      }).catch((e) => {
-        console.log(e)
-      })
-      console.log(Data)
+    //   async test() {
+    //     const Data = await OHLCV({
+    //       fsym: 'BTC',
+    //       tsym: 'USD',
+    //       limit: 10,
+    //     }).catch((e) => {
+    //       console.log(e)
+    //     })
+    //     console.log(Data)
+    //   },
+    //   historyProvider() {},
+    // },
+    destroyed() {
+      if (this.tvWidget !== null) {
+        this.tvWidget.remove()
+        this.tvWidget = null
+      }
     },
-    historyProvider() {},
-  },
-  destroyed() {
-    if (this.tvWidget !== null) {
-      this.tvWidget.remove()
-      this.tvWidget = null
-    }
   },
 }
 </script>

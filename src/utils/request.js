@@ -1,20 +1,20 @@
-import axios from "axios";
+import axios from 'axios'
 
 const instance = axios.create({
-  baseURL: "https://min-api.cryptocompare.com/data",
+  baseURL: 'https://min-api.cryptocompare.com/data',
   timeout: 1000,
-});
+})
 
 instance.interceptors.request.use(
   (config) => {
-    return config;
+    return config
   },
   (error) => Promise.reject(error)
-);
+)
 instance.interceptors.response.use(
   (response) => {
-    return response;
+    return response
   },
   (error) => Promise.reject(error)
-);
-export default instance;
+)
+export default instance
