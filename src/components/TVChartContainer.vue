@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { widget } from '../../public/charting_library'
+import { widget } from '../../public/coin-chart/charting_library'
 import Datafeed from '@/apis/tradingveiw'
 
 export default {
@@ -22,7 +22,7 @@ export default {
       type: String,
     },
     libraryPath: {
-      default: '/charting_library/',
+      default: '/coin-chart/charting_library/',
       type: String,
     },
     chartsStorageUrl: {
