@@ -5,6 +5,7 @@
 <script>
 import { widget } from '../../public/charting_library'
 import Datafeed from '@/apis/tradingveiw'
+
 export default {
   name: 'TVChartContainer',
   props: {
@@ -54,7 +55,6 @@ export default {
   },
   tvWidget: null,
   mounted() {
-    console.log(Datafeed)
     const widgetOptions = {
       symbol: this.symbol,
       // BEWARE: no trailing slash is expected in feed URL
@@ -75,38 +75,26 @@ export default {
     }
     const tvWidget = new widget(widgetOptions)
     this.tvWidget = tvWidget
-    tvWidget.onChartReady(() => {
-      tvWidget.headerReady().then(() => {
-        const button = tvWidget.createButton()
-        button.setAttribute('title', 'Click to show a notification popup')
-        button.classList.add('apply-common-tooltip')
-        button.addEventListener('click', () =>
-          tvWidget.showNoticeDialog({
-            title: 'Notification',
-            body: 'TradingView Charting Library API works correctly',
-            callback: () => {
-              // eslint-disable-next-line no-console
-              console.log('Noticed!')
-            },
-          })
-        )
-        button.innerHTML = 'Check API'
-      })
-    })
+    // tvWidget.onChartReady(() => {
+    //   tvWidget.headerReady().then(() => {
+    //     const button = tvWidget.createButton()
+    //     button.setAttribute('title', 'Click to show a notification popup')
+    //     button.classList.add('apply-common-tooltip')
+    //     button.addEventListener('click', () =>
+    //       tvWidget.showNoticeDialog({
+    //         title: 'Notification',
+    //         body: 'TradingView Charting Library API works correctly',
+    //         callback: () => {
+    //           // eslint-disable-next-line no-console
+    //           console.log('Noticed!')
+    //         },
+    //       })
+    //     )
+    //     button.innerHTML = 'Check API'
+    //   })
+    // })
   },
   methods: {
-    //   async test() {
-    //     const Data = await OHLCV({
-    //       fsym: 'BTC',
-    //       tsym: 'USD',
-    //       limit: 10,
-    //     }).catch((e) => {
-    //       console.log(e)
-    //     })
-    //     console.log(Data)
-    //   },
-    //   historyProvider() {},
-    // },
     destroyed() {
       if (this.tvWidget !== null) {
         this.tvWidget.remove()

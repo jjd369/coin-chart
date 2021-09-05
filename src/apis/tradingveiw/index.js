@@ -1,7 +1,7 @@
 import historyProvider from './historyProvider'
-// import stream from './stream'
+import stream from './stream'
 const supportedResolutions = [
-  // '1',
+  '1',
   // '3',
   // '5',
   // '15',
@@ -40,9 +40,9 @@ export default {
       description: '',
       type: 'crypto',
       session: '24x7',
-      timezone: 'Etc/UTC',
+      timezone: 'Asia/Seoul',
       ticker: symbolName,
-      exchange: 'CCCAGG',
+      exchange: 'Coinbase',
       minmov: 1,
       pricescale: 100000000,
       has_intraday: true,
@@ -90,17 +90,17 @@ export default {
     symbolInfo,
     resolution,
     onRealtimeCallback,
-    subscribeUID,
+    subscriberUID,
     onResetCacheNeededCallback
   ) => {
     console.log('=====subscribeBars runnning')
-    // stream.subscribeBars(
-    //   symbolInfo,
-    //   resolution,
-    //   onRealtimeCallback,
-    //   subscribeUID,
-    //   onResetCacheNeededCallback
-    // )
+    stream.subscribeBars(
+      symbolInfo,
+      resolution,
+      onRealtimeCallback,
+      subscriberUID,
+      onResetCacheNeededCallback
+    )
   },
   unsubscribeBars: (subscriberUID) => {
     console.log('=====unsubscribeBars running')
