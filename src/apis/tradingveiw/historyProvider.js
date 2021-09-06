@@ -6,7 +6,9 @@ export default {
   history: history,
 
   getBars: function (symbolInfo, resolution, periodParams) {
+    const { countBack, firstDataRequest, to } = periodParams
     var split_symbol = symbolInfo.name.split(/[:/]/)
+
     const histo =
       resolution === 'D'
         ? 'histoday'
@@ -17,33 +19,41 @@ export default {
     const params = {
       fsym: split_symbol[0],
       tsym: split_symbol[1],
-      toTs: periodParams.to ? periodParams.to : '',
-      limit: periodParams.countBack < 2000 ? periodParams.countBack : 2000,
-      e: 'Coinbase'
+      toTs: to || '',
+      limit: countBack < 2000 ? countBack : 2000,
+      e: 'Coinbase',
     }
 
-    return OHLCV(params, histo)
-      .then(({ data }) => {
-        const { Data } = data
+    getHistory(params, histo).then((data) => {
+      console.log(data)
+    })
 
-        if (!Data.Data.length) return []
+    return OHLCV(params, histo).then(({ data }) => {
+      const { Data } = data
 
-        var bars = Data.Data.map((el) => {
-          return {
-            time: el.time * 1000, //TradingView requires bar time in ms
-            low: el.low,
-            high: el.high,
-            open: el.open,
-            close: el.close,
-            volume: el.volumefrom,
-          }
-        })
+      if (!Data.Data.length) return []
 
-        if (periodParams.firstDataRequest) {
-          var lastBar = bars[bars.length - 1]
-          history[symbolInfo.name] = { lastBar: lastBar }
+      var bars = Data.Data.map((el) => {
+        return {
+          time: el.time * 1000, //TradingView requires bar time in ms
+          low: el.low,
+          high: el.high,
+          open: el.open,
+          close: el.close,
+          volume: el.volumefrom,
         }
-        return bars
       })
+
+      if (firstDataRequest) {
+        var lastBar = bars[bars.length - 1]
+        history[symbolInfo.name] = { lastBar: lastBar }
+      }
+      return bars
+    })
   },
+}
+
+async function getHistory(params, histo) {
+  const { data } = await OHLCV(params, histo).catch((e) => console.log(e))
+  return data.Data.Data
 }

@@ -105,7 +105,7 @@ export default {
   unsubscribeBars: (subscriberUID) => {
     console.log('=====unsubscribeBars running')
 
-    // stream.unsubscribeBars(subscriberUID)
+    stream.unsubscribeBars(subscriberUID)
   },
   // calculateHistoryDepth: (resolution, resolutionBack, intervalBack) => {
   //   //optional
