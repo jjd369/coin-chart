@@ -24,10 +24,6 @@ export default {
       e: 'Coinbase',
     }
 
-    getHistory(params, histo).then((data) => {
-      console.log(data)
-    })
-
     return OHLCV(params, histo).then(({ data }) => {
       const { Data } = data
 
@@ -51,9 +47,4 @@ export default {
       return bars
     })
   },
-}
-
-async function getHistory(params, histo) {
-  const { data } = await OHLCV(params, histo).catch((e) => console.log(e))
-  return data.Data.Data
 }

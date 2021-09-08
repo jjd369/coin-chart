@@ -8,25 +8,9 @@ export function OHLCV(params, resolution) {
   })
 }
 
-export function getHistoday(params) {
+export function getOrderBook(params) {
   return request({
-    url: 'v2/histoday',
-    method: 'get',
-    params,
-  })
-}
-
-export function getHistohour(params) {
-  return request({
-    url: 'v2/histohour',
-    method: 'get',
-    params,
-  })
-}
-
-export function getHistominute(params) {
-  return request({
-    url: 'v2/histominute',
+    url: 'v2/ob/l2/snapshot',
     method: 'get',
     params,
   })

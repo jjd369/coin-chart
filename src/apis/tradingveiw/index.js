@@ -32,8 +32,6 @@ export default {
   ) => {
     // expects a symbolInfo object in response
     console.log('======resolveSymbol running')
-    // console.log('resolveSymbol:',{symbolName})
-    var split_data = symbolName.split(/[:/]/)
 
     var symbol_stub = {
       name: symbolName,
@@ -52,15 +50,10 @@ export default {
       data_status: 'streaming',
     }
 
-    // if (split_data[2].match(/USD|EUR|JPY|AUD|GBP|KRW|CNY/)) {
-    //   symbol_stub.pricescale = 100
-    // }
     setTimeout(function () {
       onSymbolResolvedCallback(symbol_stub)
       console.log('Resolving that symbol....', symbol_stub)
     }, 0)
-
-    // onResolveErrorCallback('Not feeling it today')
   },
   getBars: function (
     symbolInfo,
@@ -70,8 +63,6 @@ export default {
     onErrorCallback
   ) {
     console.log('=====getBars running')
-    // console.log('function args',arguments)
-    // console.log(`Requesting bars between ${new Date(from * 1000).toISOString()} and ${new Date(to * 1000).toISOString()}`)
     historyProvider
       .getBars(symbolInfo, resolution, periodParams)
       .then((bars) => {
@@ -105,17 +96,8 @@ export default {
   unsubscribeBars: (subscriberUID) => {
     console.log('=====unsubscribeBars running')
 
-    stream.unsubscribeBars(subscriberUID)
+    // stream.unsubscribeBars(subscriberUID)
   },
-  // calculateHistoryDepth: (resolution, resolutionBack, intervalBack) => {
-  //   //optional
-  //   console.log('=====calculateHistoryDepth running')
-  //   // while optional, this makes sure we request 24 hours of minute data at a time
-  //   // CryptoCompare's minute data endpoint will throw an error if we request data beyond 7 days in the past, and return no data
-  //   return resolution < 60
-  //     ? { resolutionBack: 'D', intervalBack: '1' }
-  //     : undefined
-  // },
   getMarks: (symbolInfo, from, to, onDataCallback, resolution) => {
     //optional
     console.log('=====getMarks running')

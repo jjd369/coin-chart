@@ -1,10 +1,9 @@
 <template>
   <el-container>
-    <el-header>Header</el-header>
+    <el-header><Header></Header></el-header>
     <el-container>
-      <el-aside width="200px">Aside</el-aside>
       <el-container>
-        <el-main><TVChartContainer></TVChartContainer></el-main>
+        <el-main><Main></Main></el-main>
         <el-footer>Footer</el-footer>
       </el-container>
     </el-container>
@@ -13,13 +12,14 @@
 
 <script>
 // @ is an alias to /src
-// import Header from "@/components/header.vue";
-import TVChartContainer from '@/components/TVChartContainer.vue'
+import Header from '@/components/header.vue'
+import Main from '@/views/main.vue'
+
 export default {
   name: 'Home',
   components: {
-    TVChartContainer,
-    // Header,
+    Header,
+    Main,
   },
   mounted() {},
 }
