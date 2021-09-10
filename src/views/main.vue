@@ -6,18 +6,22 @@
     <el-tab-pane label="Order Book" name="second"
       ><orderBook></orderBook
     ></el-tab-pane>
-    <el-tab-pane label="Trades" name="third">Role</el-tab-pane>
+    <el-tab-pane label="coinList" name="third"
+      ><coinList></coinList
+    ></el-tab-pane>
   </el-tabs>
 </template>
 
 <script>
 import TVChartContainer from '@/components/TVChartContainer.vue'
 import orderBook from '@/components/orderBook.vue'
+import coinList from '@/components/coinList.vue'
 
 export default {
   components: {
     TVChartContainer,
     orderBook,
+    coinList,
   },
   data() {
     return {

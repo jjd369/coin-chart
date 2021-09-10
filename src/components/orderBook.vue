@@ -82,7 +82,6 @@ export default {
     },
     filter_BID(data) {
       const { BID } = data
-      console.log(BID[0])
       this.bid.push(BID[0])
       this.bid.shift()
     },
