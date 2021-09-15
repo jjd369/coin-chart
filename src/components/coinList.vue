@@ -1,36 +1,52 @@
 <template>
   <div>
-    <div> </div>
+    <div>
+      <div>
+        <span>Pair</span>
+        <span>Price</span>
+        <span>Change</span>
+      </div>
+      <ul>
+        <template v-for="(val, index) in c_coin_list">
+          <li :key="index">
+            <span>
+              <!-- <el-rate max="1" v-model="like"></el-rate> -->
+              {{ val.title }}/{{ TSYM }}
+            </span>
+            <span> </span>
+          </li>
+        </template>
+      </ul>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import filter from 'lodash/filter'
-import includes from 'lodash/includes'
 
 export default {
   data() {
-    return {}
+    return {
+      like: null,
+    }
   },
-  mounted() {},
   computed: {
-    ...mapState(['coin_list', 'TSYM']),
-
+    ...mapState(['socket', 'coin_list', 'TSYM']),
     c_coin_list() {
-      return this.test()
+      return this.coinFilter()
     },
   },
-  // mounted() {
-  //   Promise.all([this.getCoinList()]).catch((e) => {
-  //     console.log(e)
-  //   })
-  // },
+  mounted() {
+    // this.socket.onmessage = (event) => {
+    //   let data = JSON.parse(event.data)
+    //   console.log(data)
+    // }
+  },
   methods: {
-    test() {
+    coinFilter() {
       return filter(this.coin_list, (el) => {
-        console.log(el)
-        return el.tsyms
+        return el.tsyms.includes(this.TSYM)
       })
     },
   },

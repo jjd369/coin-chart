@@ -34,6 +34,8 @@
 <script>
 import { getOrderBook } from '@/apis/cryptocompare'
 import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
+
 // import find from 'lodash/find'
 export default {
   name: 'coinList',
@@ -42,24 +44,21 @@ export default {
       bid: null,
       ask: null,
       order_type: '',
+      snackbar: '',
     }
   },
-  watch: {
-    // bid() {
-    //   console.log(this.bid.length)
-    //   if (this.bid.length > 31) {
-    //     console.log('bid')
-    //     this.bid.length = 30
-    //   }
-    // },
-  },
   computed: {
-    ...mapState(['socket']),
+    ...mapState('socket', ['order_book']),
+    ...mapGetters('socket', ['displayOrderBook']),
+  },
+  watch: {
+    order_book(val) {
+      this.snackbar = val
+    },
   },
   mounted() {
-    console.log('orderbook mounted')
     Promise.all([this.getOrderBook()])
-      .then(this.socketOnMessage)
+      // .then(this.socketOnMessage)
       .catch((e) => {
         console.log(e)
       })
@@ -70,11 +69,19 @@ export default {
       this.bid = data.Data.BID
       this.ask = data.Data.ASK
     },
+    // socketOnMessage() {
+    //   this.socket.onmessage = (event) => {
+    //     let data = JSON.parse(event.data)
+    //     if (data.TYPE !== '30') return
+    //     Object.keys(data).includes('BID')
+    //       ? this.filter_BID(data)
+    //       : this.filter_ASK(data)
+    //   }
+    // },
     socketOnMessage() {
       this.socket.onmessage = (event) => {
         let data = JSON.parse(event.data)
         if (data.TYPE !== '30') return
-
         Object.keys(data).includes('BID')
           ? this.filter_BID(data)
           : this.filter_ASK(data)
