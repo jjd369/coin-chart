@@ -44,24 +44,20 @@ export default {
       bid: null,
       ask: null,
       order_type: '',
-      snackbar: '',
     }
   },
   computed: {
     ...mapState('socket', ['order_book']),
-    ...mapGetters('socket', ['displayOrderBook']),
   },
   watch: {
     order_book(val) {
-      this.snackbar = val
+      this.updateOrder(val)
     },
   },
   mounted() {
-    Promise.all([this.getOrderBook()])
-      // .then(this.socketOnMessage)
-      .catch((e) => {
-        console.log(e)
-      })
+    Promise.all([this.getOrderBook()]).catch((e) => {
+      console.log(e)
+    })
   },
   methods: {
     async getOrderBook() {
@@ -69,23 +65,11 @@ export default {
       this.bid = data.Data.BID
       this.ask = data.Data.ASK
     },
-    // socketOnMessage() {
-    //   this.socket.onmessage = (event) => {
-    //     let data = JSON.parse(event.data)
-    //     if (data.TYPE !== '30') return
-    //     Object.keys(data).includes('BID')
-    //       ? this.filter_BID(data)
-    //       : this.filter_ASK(data)
-    //   }
-    // },
-    socketOnMessage() {
-      this.socket.onmessage = (event) => {
-        let data = JSON.parse(event.data)
-        if (data.TYPE !== '30') return
-        Object.keys(data).includes('BID')
-          ? this.filter_BID(data)
-          : this.filter_ASK(data)
-      }
+    updateOrder(newVal) {
+      if (newVal.TYPE !== '30') return
+      Object.keys(newVal).includes('BID')
+        ? this.filter_BID(newVal)
+        : this.filter_ASK(newVal)
     },
     filter_BID(data) {
       const { BID } = data

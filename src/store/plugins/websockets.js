@@ -5,11 +5,6 @@ const socket = new WebSocket(
 
 export default function createWebSocketPlugin() {
   return (store) => {
-    socket.onmessage = (message) => {
-      var data = JSON.parse(message.data)
-      store.dispatch('socket/addMessage', data)
-    }
-
     socket.onopen = () => {
       store.dispatch('socket/connectionOpened')
       var subRequest = {
@@ -23,10 +18,15 @@ export default function createWebSocketPlugin() {
       socket.send(JSON.stringify(subRequest))
     }
 
-    store.subscribe((mutation) => {
-      if (mutation.type === 'socket/UPDATE_DATA') {
-        socket.send(JSON.stringify(mutation.payload))
-      }
-    })
+    socket.onmessage = (message) => {
+      var data = JSON.parse(message.data)
+      store.dispatch('socket/addMessage', data)
+    }
+
+    // store.subscribe((mutation) => {
+    //   if (mutation.type === 'socket/UPDATE_DATA') {
+    //     socket.send(JSON.stringify(mutation.payload))
+    //   }
+    // })
   }
 }
