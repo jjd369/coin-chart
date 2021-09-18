@@ -9,11 +9,7 @@ export default function createWebSocketPlugin() {
       store.dispatch('socket/connectionOpened')
       var subRequest = {
         action: 'SubAdd',
-        subs: [
-          // '0~Coinbase~BTC~USD',
-          // '2~Coinbase~BTC~USD',
-          '30~Binance~BTC~USDT',
-        ],
+        subs: store.state.socket.channel_string,
       }
       socket.send(JSON.stringify(subRequest))
     }

@@ -21,7 +21,7 @@ export default {
       tsym: split_symbol[1],
       toTs: to || '',
       limit: countBack < 2000 ? countBack : 2000,
-      e: 'Coinbase',
+      e: 'Binance',
     }
 
     return OHLCV(params, histo).then(({ data }) => {

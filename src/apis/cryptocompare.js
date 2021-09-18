@@ -14,9 +14,16 @@ export function getOrderBook(params) {
     params,
   })
 }
-export function getCoinList(params) {
+export function fetchCoinList(params) {
   return request({
     url: 'v4/all/exchanges',
+    method: 'get',
+    params,
+  })
+}
+export function fetchSymbolsFullData(params) {
+  return request({
+    url: 'pricemultifull',
     method: 'get',
     params,
   })

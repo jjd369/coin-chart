@@ -7,13 +7,13 @@
         <span>Change</span>
       </div>
       <ul>
-        <template v-for="(val, index) in c_coin_list">
-          <li :key="index">
+        <template v-for="(val, key, index) in symbols_full_data">
+          <li :key="index" @click="changeAsset(val)">
             <span>
               <!-- <el-rate max="1" v-model="like"></el-rate> -->
-              {{ val.title }}/{{ TSYM }}
+              {{ key }}/{{ TSYM }}
             </span>
-            <span> </span>
+            <span> {{}} </span>
           </li>
         </template>
       </ul>
@@ -22,8 +22,10 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
+import { fetchSymbolsFullData } from '@/apis/cryptocompare'
 import filter from 'lodash/filter'
+import map from 'lodash/map'
 
 export default {
   data() {
@@ -32,22 +34,16 @@ export default {
     }
   },
   computed: {
-    ...mapState(['socket', 'coin_list', 'TSYM']),
-    c_coin_list() {
-      return this.coinFilter()
-    },
+    ...mapState('asset', ['TSYM']),
+    ...mapState('asset', ['FSYMS']),
+    ...mapState('asset', ['symbols_full_data']),
   },
   mounted() {
-    // this.socket.onmessage = (event) => {
-    //   let data = JSON.parse(event.data)
-    //   console.log(data)
-    // }
+    console.log(this.symbols_full_data)
   },
   methods: {
-    coinFilter() {
-      return filter(this.coin_list, (el) => {
-        return el.tsyms.includes(this.TSYM)
-      })
+    changeAsset(val) {
+      console.log(val)
     },
   },
 }

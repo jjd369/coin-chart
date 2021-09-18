@@ -38,7 +38,6 @@ import { mapGetters } from 'vuex'
 
 // import find from 'lodash/find'
 export default {
-  name: 'coinList',
   data() {
     return {
       bid: null,
@@ -47,10 +46,10 @@ export default {
     }
   },
   computed: {
-    ...mapState('socket', ['order_book']),
+    ...mapGetters('socket', ['displayOrderBook']),
   },
   watch: {
-    order_book(val) {
+    displayOrderBook(val) {
       this.updateOrder(val)
     },
   },
