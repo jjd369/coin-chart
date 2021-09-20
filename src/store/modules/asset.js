@@ -12,24 +12,7 @@ export const state = {
   symbols_full_data: [],
 }
 
-export const getters = {
-  displayFsymsList: (state) => {
-    let fsyms = filter(state.coin_list, (el) => {
-      return el.tsyms.includes(state.TSYM)
-    })
-
-    let fsyms_list = map(fsyms, (el) => {
-      return el.title
-    })
-
-    fsyms_list.length > 100 ? (fsyms_list.length = 100) : fsyms_list
-
-    return fsyms_list
-  },
-  displayFsyms: (state, getters) => {
-    return getters.displayFsymsList.toString()
-  },
-}
+export const getters = {}
 
 export const mutations = {
   SET_FSYMS_LIST(state) {
@@ -62,8 +45,7 @@ export const mutations = {
       fsyms: state.FSYMS,
       tsyms: state.TSYM,
     })
-
-    state.symbols_full_data = data.RAW
+    state.symbols_full_data = data.DISPLAY
   },
 }
 
