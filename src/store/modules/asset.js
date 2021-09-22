@@ -1,7 +1,7 @@
 import { fetchCoinList } from '@/apis/cryptocompare'
+import { fetchSymbolsFullData } from '@/apis/cryptocompare'
 import map from 'lodash/map'
 import filter from 'lodash/filter'
-import { fetchSymbolsFullData } from '@/apis/cryptocompare'
 
 export const state = {
   FSYM: 'BNB',
@@ -40,19 +40,28 @@ export const mutations = {
     })
     state.coin_list = new_coin_list
   },
-  async SET_SYMBOLS_FULL_DATA(state, newVal) {
+  async SET_SYMBOLS_FULL_DATA(state) {
     const { data } = await fetchSymbolsFullData({
       fsyms: state.FSYMS,
       tsyms: state.TSYM,
+      e: 'binance',
     })
-    state.symbols_full_data = data.DISPLAY
+    let data_raw = data.RAW
+    for (const key in data_raw) {
+      state.symbols_full_data.push(data_raw[key][`${state.TSYM}`])
+    }
   },
 }
 
 export const actions = {
   init({ dispatch }) {
     Promise.all([dispatch('getCoinList')])
-      // .then(dispatch('getSymbolsFullData'))
+      .then(() => {
+        dispatch('getFsymsList')
+      })
+      .then(() => {
+        dispatch('getSymbolsFullData')
+      })
       .catch((e) => {
         console.log(e)
       })
@@ -62,7 +71,11 @@ export const actions = {
     // Binance 기준 거래 통화
     const { data } = await fetchCoinList({ e: 'Binance' })
     commit('SET_COIN_LIST', data.Data.exchanges.Binance.pairs)
+  },
+  getFsymsList({ commit }) {
     commit('SET_FSYMS_LIST')
+  },
+  getSymbolsFullData({ commit }) {
     commit('SET_SYMBOLS_FULL_DATA')
   },
 }

@@ -8,7 +8,6 @@
 import { widget } from '../../public/charting_library'
 import historyProvider from '@/utils/historyProvider'
 import { mapGetters } from 'vuex'
-let _subs = []
 
 export default {
   name: 'TVChartContainer',
@@ -59,7 +58,9 @@ export default {
   },
   tvWidget: null,
   data() {
-    return {}
+    return {
+      subs: [],
+    }
   },
   computed: {
     ...mapGetters('socket', ['displayTrade']),
@@ -67,7 +68,8 @@ export default {
   watch: {
     displayTrade(newValue) {
       const channelString = `${newValue.TYPE}~${newValue.M}~${newValue.FSYM}~${newValue.TSYM}`
-      const sub = _subs.find((e) => e.channelString === channelString)
+      const sub = this.subs.find((e) => e.channelString === channelString)
+
       // sub이 없으면 리턴
       if (!sub) return
       // lastbar의 time보다 낮으면 리턴
@@ -148,7 +150,7 @@ export default {
             session: '24x7',
             timezone: 'Asia/Seoul',
             ticker: symbolName,
-            exchange: 'Coinbase',
+            exchange: 'Binance',
             minmov: 1,
             pricescale: 100000000,
             has_intraday: true,
@@ -243,7 +245,7 @@ export default {
         lastBar: historyProvider.history[symbolInfo.name].lastBar,
         listener: onRealtimeCallback,
       }
-      _subs.push(newSub)
+      this.subs.push(newSub)
     },
     updateBar(data, sub) {
       let lastBar = sub.lastBar
@@ -289,8 +291,9 @@ export default {
       return _lastBar
     },
     createChannelString(symbolInfo) {
+      console.log(symbolInfo)
       var channel = symbolInfo.name.split(/[:/]/)
-      const exchange = 'Coinbase'
+      const exchange = symbolInfo.exchange
       const to = channel[1]
       const from = channel[0]
       // subscribe to the CryptoCompare trade channel for the pair and exchange

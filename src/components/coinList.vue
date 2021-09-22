@@ -7,7 +7,7 @@
         <span>Change</span>
       </div>
       <ul>
-        <template v-for="(val, key, index) in symbols_full_data">
+        <template v-for="(val, index) in c_coin_list">
           <li
             :class="$style.contentWrap"
             :key="index"
@@ -15,10 +15,10 @@
           >
             <span>
               <!-- <el-rate max="1" v-model="like"></el-rate> -->
-              {{ key }}/{{ TSYM }}
+              {{ val.FROMSYMBOL }}/{{ TSYM }}
             </span>
-            <span> {{ val[`${TSYM}`].PRICE }} </span>
-            <span>{{ val[`${TSYM}`].CHANGEDAY }}</span>
+            <span> {{ calculatePrice(val.PRICE) }} </span>
+            <span>{{ calculateChangeDay(val.OPENDAY, val.PRICE) + '%' }}</span>
           </li>
         </template>
       </ul>
@@ -31,34 +31,41 @@ import { mapState, mapGetters } from 'vuex'
 import { fetchSymbolsFullData } from '@/apis/cryptocompare'
 import filter from 'lodash/filter'
 import map from 'lodash/map'
+import Decimal from 'decimal.js'
 
 export default {
   data() {
     return {
       like: null,
-      coin_list_array: [],
     }
   },
   computed: {
     ...mapState('asset', ['TSYM']),
     ...mapState('asset', ['FSYMS']),
     ...mapState('asset', ['symbols_full_data']),
-    c_coin_array() {
-      for (const key in this.symbols_full_data) {
-        console.log(key)
-      }
-      return null
+    c_coin_list() {
+      return map(this.symbols_full_data, (el) => {
+        return {
+          FROMSYMBOL: el.FROMSYMBOL,
+          TOSYMBOL: el.TOSYMBOL,
+          PRICE: el.PRICE,
+          VOLUMEDAY: el.VOLUMEDAY,
+          OPENDAY: el.OPENDAY,
+        }
+      })
     },
   },
-  mounted() {
-    for (const key in this.symbols_full_data) {
-      console.log(this.symbols_full_data[key][`${this.TSYM}`])
-      this.coin_list_array.push(this.symbols_full_data[key][`${this.TSYM}`])
-    }
-  },
+  mounted() {},
   methods: {
+    Decimal,
     changeAsset(val) {
       console.log(val)
+    },
+    calculatePrice(price) {
+      return new Decimal(price).toFixed(8)
+    },
+    calculateChangeDay(openDay, price) {
+      return Decimal.sub(price, openDay).div(openDay).mul(100).toFixed(2)
     },
   },
 }
@@ -68,6 +75,10 @@ export default {
 .titleWrap {
   display: flex;
   align-items: center;
+  span {
+    display: flex;
+    flex: 1 1 0%;
+  }
 }
 .contentWrap {
   display: flex;
