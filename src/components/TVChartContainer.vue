@@ -291,7 +291,6 @@ export default {
       return _lastBar
     },
     createChannelString(symbolInfo) {
-      console.log(symbolInfo)
       var channel = symbolInfo.name.split(/[:/]/)
       const exchange = symbolInfo.exchange
       const to = channel[1]
