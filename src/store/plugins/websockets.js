@@ -19,10 +19,14 @@ export default function createWebSocketPlugin() {
       store.dispatch('socket/addMessage', data)
     }
 
-    // store.subscribe((mutation) => {
-    //   if (mutation.type === 'socket/UPDATE_DATA') {
-    //     socket.send(JSON.stringify(mutation.payload))
-    //   }
-    // })
+    store.subscribe((mutation) => {
+      if (mutation.type === 'socket/CREATE_CHANNEL_STRING') {
+        var subRequest = {
+          action: 'SubAdd',
+          subs: store.state.socket.channel_string,
+        }
+        socket.send(JSON.stringify(subRequest))
+      }
+    })
   }
 }

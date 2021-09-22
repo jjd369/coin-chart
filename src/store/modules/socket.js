@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 export const state = {
   connected: false,
   error: null,
@@ -14,9 +16,20 @@ export const state = {
 export const getters = {
   displayOrderBook: (state) => state.order_book,
   displayTrade: (state) => state.trade,
+  displayTicker: (state) => state.ticker,
 }
 
 export const mutations = {
+  CREATE_CHANNEL_STRING(state, payload) {
+    let channel_string
+    channel_string = _.chain(payload.fsyms)
+      .split(',')
+      .map((el) => {
+        return `${payload.type}~Binance~${el}~BTC`
+      })
+      .value()
+    state.channel_string = [...state.channel_string, ...channel_string]
+  },
   ADD_MESSAGE(state, message) {
     if (message.TYPE === '30') state.order_book = message
     if (message.TYPE === '0') state.trade = message
