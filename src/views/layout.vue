@@ -2,10 +2,8 @@
   <el-container>
     <el-header><Header></Header></el-header>
     <el-container>
-      <el-container>
-        <el-main><Main></Main></el-main>
-        <el-footer>Footer</el-footer>
-      </el-container>
+      <el-main><Main></Main></el-main>
+      <el-footer>Footer</el-footer>
     </el-container>
   </el-container>
 </template>

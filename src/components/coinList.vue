@@ -61,20 +61,29 @@ export default {
   },
   watch: {
     displayTicker(newVal) {
-      let assets_list_index = findIndex(this.test, {
+      let new_asset = find(this.test, {
         FROMSYMBOL: newVal.FROMSYMBOL,
       })
-      if (assets_list_index) {
-        this.test.splice(assets_list_index, 1, newVal)
-      }
-      // console.log(find(this.c_coin_list, { FROMSYMBOL: newVal.FROMSYMBOL }))
+      console.log(new_asset)
+      // if (assets_list_index !== -1) {
+      //   this.test.splice(assets_list_index, 1, newVal)
+      // }
     },
   },
-  mounted() {
-    this.test = this.assets_full_data
-  },
+  mounted() {},
   methods: {
-    Decimal,
+    test_meth() {
+      let test = map(this.assets_full_data, (el) => {
+        return {
+          FROMSYMBOL: el.FROMSYMBOL,
+          TOSYMBOL: el.TOSYMBOL,
+          PRICE: el.PRICE,
+          VOLUMEDAY: el.VOLUMEDAY,
+          OPENDAY: el.OPENDAY,
+        }
+      })
+      this.test = test
+    },
     changeAsset(val) {
       console.log(val)
     },
@@ -84,6 +93,7 @@ export default {
     calculateChangeDay(openDay, price) {
       return Decimal.sub(price, openDay).div(openDay).mul(100).toFixed(2)
     },
+    Decimal,
   },
 }
 </script>
