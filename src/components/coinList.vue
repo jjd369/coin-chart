@@ -1,28 +1,37 @@
 <template>
-  <div>
-    <div>
-      <div :class="$style.titleWrap">
-        <span>Pair</span>
-        <span>Price</span>
-        <span>Change</span>
-      </div>
-      <ul>
-        <template v-for="(val, index) in test">
+  <div :class="$style.coinListWrap" class="boxLine">
+    <div :class="$style.titleWrap">
+      <span>Pair</span>
+      <span>Price</span>
+      <span>Change</span>
+    </div>
+    <ul :class="$style.contentWrap">
+      <perfect-scrollbar>
+        <template v-for="(val, index) in coin_list">
           <li
-            :class="$style.contentWrap"
+            :class="$style.listWrap"
             :key="index"
-            @click="changeAsset(val)"
+            @click="changeAsset(val.FROMSYMBOL, val.TOSYMBOL)"
           >
             <span>
               <!-- <el-rate max="1" v-model="like"></el-rate> -->
               {{ val.FROMSYMBOL }}/{{ TSYM }}
             </span>
-            <span> {{ calculatePrice(val.PRICE) }} </span>
-            <span>{{ calculateChangeDay(val.OPENDAY, val.PRICE) + '%' }}</span>
+            <span :class="val.FLAGS === '1' ? $style.green : $style.red">
+              {{ calculatePrice(val.PRICE) }}
+            </span>
+            <span
+              :class="
+                calculateChangeDay(val.OPENDAY, val.PRICE) > 0
+                  ? $style.green
+                  : $style.red
+              "
+              >{{ calculateChangeDay(val.OPENDAY, val.PRICE) + '%' }}</span
+            >
           </li>
         </template>
-      </ul>
-    </div>
+      </perfect-scrollbar>
+    </ul>
   </div>
 </template>
 
@@ -39,7 +48,7 @@ export default {
   data() {
     return {
       like: null,
-      test: [],
+      coin_list: [],
     }
   },
   computed: {
@@ -47,45 +56,27 @@ export default {
     ...mapState('asset', ['FSYMS']),
     ...mapState('asset', ['assets_full_data']),
     ...mapGetters('socket', ['displayTicker']),
-    c_coin_list() {
-      return map(this.assets_full_data, (el) => {
-        return {
-          FROMSYMBOL: el.FROMSYMBOL,
-          TOSYMBOL: el.TOSYMBOL,
-          PRICE: el.PRICE,
-          VOLUMEDAY: el.VOLUMEDAY,
-          OPENDAY: el.OPENDAY,
-        }
-      })
-    },
   },
   watch: {
     displayTicker(newVal) {
-      let new_asset = find(this.test, {
+      let find_asset = find(this.coin_list, {
         FROMSYMBOL: newVal.FROMSYMBOL,
       })
-      console.log(new_asset)
-      // if (assets_list_index !== -1) {
-      //   this.test.splice(assets_list_index, 1, newVal)
-      // }
+      if (find_asset === undefined) return
+      if (!newVal.PRICE) return
+
+      find_asset.PRICE = newVal.PRICE
+      find_asset.FLAGS = newVal.FLAGS.toString()
+
+      let find_asset_index = findIndex(this.coin_list, {
+        FROMSYMBOL: newVal.FROMSYMBOL,
+      })
+      this.coin_list.splice(find_asset_index, 1, find_asset)
     },
   },
-  mounted() {},
   methods: {
-    test_meth() {
-      let test = map(this.assets_full_data, (el) => {
-        return {
-          FROMSYMBOL: el.FROMSYMBOL,
-          TOSYMBOL: el.TOSYMBOL,
-          PRICE: el.PRICE,
-          VOLUMEDAY: el.VOLUMEDAY,
-          OPENDAY: el.OPENDAY,
-        }
-      })
-      this.test = test
-    },
-    changeAsset(val) {
-      console.log(val)
+    changeAsset(FSYM, TSYM) {
+      this.$store.dispatch('asset/updateSymbol', { FSYM: FSYM, TSYM: TSYM })
     },
     calculatePrice(price) {
       return new Decimal(price).toFixed(8)
@@ -95,24 +86,50 @@ export default {
     },
     Decimal,
   },
+  mounted() {
+    this.coin_list = this.assets_full_data
+  },
 }
 </script>
 
 <style lang="scss" module>
-.titleWrap {
-  display: flex;
-  align-items: center;
-  span {
+.coinListWrap {
+  margin-bottom: 30px;
+  .titleWrap {
     display: flex;
-    flex: 1 1 0%;
+    align-items: center;
+    span {
+      display: flex;
+      flex: 1 1 0%;
+      padding-left: 1em;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+  }
+  .listWrap {
+    display: flex;
+    align-items: center;
+    &:hover {
+      cursor: pointer;
+    }
+    span {
+      display: flex;
+      flex: 1 1 0%;
+      padding-left: 1em;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+    .green {
+      color: #0ecb81;
+    }
+    .red {
+      color: #f6465d;
+    }
   }
 }
-.contentWrap {
-  display: flex;
-  align-items: center;
-  span {
-    display: flex;
-    flex: 1 1 0%;
-  }
+</style>
+<style lang="scss">
+.ps {
+  height: 500px;
 }
 </style>
