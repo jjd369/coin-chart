@@ -7,9 +7,9 @@ export const state = {
   trade: {},
   ticker: {},
   channel_string: [
-    '0~Binance~BNB~BTC',
-    '2~Binance~BNB~BTC',
-    '30~Binance~BNB~BTC',
+    '0~Binance~BTC~USDT',
+    '2~Binance~BTC~USDT',
+    // '8~Binance~BTC~USDT',
   ],
 }
 
@@ -31,7 +31,7 @@ export const mutations = {
     state.channel_string = [...state.channel_string, ...channel_string]
   },
   ADD_MESSAGE(state, message) {
-    if (message.TYPE === '30') state.order_book = message
+    if (message.TYPE === '8') state.order_book = message
     if (message.TYPE === '0') state.trade = message
     if (message.TYPE === '2') state.ticker = message
   },

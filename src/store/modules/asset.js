@@ -4,8 +4,8 @@ import map from 'lodash/map'
 import filter from 'lodash/filter'
 
 export const state = {
-  FSYM: 'BNB',
-  TSYM: 'BTC',
+  FSYM: 'BTC',
+  TSYM: 'USDT',
   FSYMS: '',
   fsyms_list: {},
   binance_assets_list: {},
@@ -15,6 +15,10 @@ export const state = {
 export const getters = {}
 
 export const mutations = {
+  SET_SYMBOL(state, newValue) {
+    state.FSYM = newValue.FSYM
+    state.TSYM = newValue.TSYM
+  },
   SET_FSYMS_LIST(state) {
     let fsyms = filter(state.binance_assets_list, (el) => {
       return el.tsyms.includes(state.TSYM)
@@ -86,5 +90,8 @@ export const actions = {
   },
   getSymbolsFullData({ commit }) {
     commit('SET_SYMBOLS_FULL_DATA')
+  },
+  updateSymbol({ commit }, newValue) {
+    commit('SET_SYMBOL', newValue)
   },
 }
