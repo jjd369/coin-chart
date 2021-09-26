@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="0" class="boxLine">
     <div :class="$style.orderBookWrap">
       <!-- bid -->
       <div :class="$style.rightBox">
@@ -33,8 +33,7 @@
 
 <script>
 import { getOrderBook } from '@/apis/cryptocompare'
-import { mapState } from 'vuex'
-import { mapGetters } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 // import find from 'lodash/find'
 export default {
@@ -47,39 +46,47 @@ export default {
   },
   computed: {
     ...mapGetters('socket', ['displayOrderBook']),
+    ...mapState('asset', ['FSYM']),
+    ...mapState('asset', ['TSYM']),
   },
   watch: {
     displayOrderBook(val) {
-      this.updateOrder(val)
+      if (val.ACTION === 2) return
+      val.SIDE === 0 ? this.updateBid(val) : this.updateAsk(val)
+    },
+  },
+  methods: {
+    async getOrderBook() {
+      const { data } = await getOrderBook({
+        fsym: this.FSYM,
+        tsym: this.TSYM,
+        e: 'Binance',
+        limit: 15,
+      })
+      this.bid = data.Data.BID
+      this.ask = data.Data.ASK
+    },
+    updateBid(data) {
+      let add_bid = {
+        P: data.P,
+        Q: data.Q,
+      }
+      this.bid.push(data)
+      this.bid.shift()
+    },
+    updateAsk(data) {
+      let add_ask = {
+        P: data.P,
+        Q: data.Q,
+      }
+      this.ask.push(data)
+      this.ask.shift()
     },
   },
   mounted() {
     Promise.all([this.getOrderBook()]).catch((e) => {
       console.log(e)
     })
-  },
-  methods: {
-    async getOrderBook() {
-      const { data } = await getOrderBook()
-      this.bid = data.Data.BID
-      this.ask = data.Data.ASK
-    },
-    updateOrder(newVal) {
-      if (newVal.TYPE !== '30') return
-      Object.keys(newVal).includes('BID')
-        ? this.filter_BID(newVal)
-        : this.filter_ASK(newVal)
-    },
-    filter_BID(data) {
-      const { BID } = data
-      this.bid.push(BID[0])
-      this.bid.shift()
-    },
-    filter_ASK(data) {
-      const { ASK } = data
-      this.ask.push(ASK[0])
-      this.ask.shift()
-    },
   },
 }
 </script>

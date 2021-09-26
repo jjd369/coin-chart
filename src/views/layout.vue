@@ -19,7 +19,6 @@ export default {
     Header,
     Main,
   },
-  mounted() {},
 }
 </script>
 <style lang="scss" scoped>
