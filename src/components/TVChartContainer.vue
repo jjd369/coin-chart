@@ -1,132 +1,93 @@
 <template>
-  <div>
-    <div class="TVChartContainer" :id="containerId" />
+  <div class="boxLine">
+    <div class="TVChartContainer" :id="container_id" />
   </div>
 </template>
 
 <script>
 import { widget } from '../../public/charting_library'
 import historyProvider from '@/utils/historyProvider'
-import { mapGetters } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
+import { OHLCV } from '@/apis/cryptocompare'
 
 export default {
   name: 'TVChartContainer',
-  props: {
-    symbol: {
-      default: 'BNB/BTC',
-      type: String,
-    },
-    interval: {
-      default: '60',
-      type: String,
-    },
-    containerId: {
-      default: 'tv_chart_container',
-      type: String,
-    },
-    libraryPath: {
-      default: '/charting_library/',
-      type: String,
-    },
-    chartsStorageUrl: {
-      default: 'https://saveload.tradingview.com',
-      type: String,
-    },
-    chartsStorageApiVersion: {
-      default: '1.1',
-      type: String,
-    },
-    clientId: {
-      default: 'tradingview.com',
-      type: String,
-    },
-    userId: {
-      default: 'public_user_id',
-      type: String,
-    },
-    fullscreen: {
-      default: false,
-      type: Boolean,
-    },
-    autosize: {
-      default: true,
-      type: Boolean,
-    },
-    studiesOverrides: {
-      type: Object,
-    },
-  },
   tvWidget: null,
   data() {
     return {
+      interval: '1D',
+      container_id: 'tv_chart_container',
+      library_path: '/charting_library/',
+      client_id: 'tradingview.com',
+      user_id: 'public_user_id',
+      fullscreen: false,
+      autosize: true,
+      studies_overrides: null,
       subs: [],
+      last_bar: null,
+      first_bar: null,
+      resolution: '',
+      onRealtimeCallback: () => {},
+      get_bar_list: [],
     }
   },
   computed: {
     ...mapGetters('socket', ['displayTrade']),
+    ...mapState('asset', ['FSYM']),
+    ...mapState('asset', ['TSYM']),
   },
   watch: {
-    displayTrade(newValue) {
-      const channelString = `${newValue.TYPE}~${newValue.M}~${newValue.FSYM}~${newValue.TSYM}`
-      const sub = this.subs.find((e) => e.channelString === channelString)
-
-      // sub이 없으면 리턴
-      if (!sub) return
-      // lastbar의 time보다 낮으면 리턴
-      if (newValue.TS < sub.lastBar.time / 1000) return
-      // 최산바 생성
-      let _lastBar = this.updateBar(newValue, sub)
-      // 최신 바 업데이트
-      sub.listener(_lastBar)
-      // sub의 lastbar 최신화
-      sub.lastBar = _lastBar
+    // displayTrade(newValue) {
+    //   // 최산바 생성
+    //   let _lastBar = this.updateBar(newValue)
+    //   // 최신 바 업데이트
+    //   this.onRealtimeCallback(_lastBar)
+    // },
+    FSYM() {
+      this.tvWidget.setSymbol(`${this.FSYM}/${this.TSYM}`, this.interval)
+      this.get_bar_list = []
     },
   },
-  mounted() {
-    this.createChart()
-  },
   methods: {
+    //create chart
     createChart() {
       const widgetOptions = {
-        symbol: this.symbol,
+        symbol: `${this.FSYM}/${this.TSYM}`,
         datafeed: this.dataFeed(),
         interval: this.interval,
-        container: this.containerId,
-        library_path: this.libraryPath,
+        container: this.container_id,
+        library_path: this.library_path,
         locale: 'ko',
-        disabled_features: ['use_localstorage_for_settings'],
-        client_id: this.clientId,
-        user_id: this.userId,
+        disabled_features: [
+          'use_localstorage_for_settings',
+          'volume_force_overlay',
+          'create_volume_indicator_by_default',
+          'timeframes_toolbar',
+          'header_compare',
+        ],
+        clientId: this.client_id,
+        userId: this.user_id,
         fullscreen: this.fullscreen,
         autosize: this.autosize,
-        studies_overrides: this.studiesOverrides,
+        studies_overrides: this.studies_overrides,
       }
       const tvWidget = new widget(widgetOptions)
       this.tvWidget = tvWidget
     },
+    // return js object for data feed
     dataFeed() {
-      const supportedResolutions = [
-        '1',
-        // '3',
-        // '5',
-        // '15',
-        // '30',
-        '60',
-        '120',
-        '240',
-        // 'D',
-      ]
+      const supportedResolutions = ['1D', '1W', '1M']
 
       const config = {
         supported_resolutions: supportedResolutions,
       }
 
       const dataObj = {
-        onReady: (cb) => {
+        onReady: (callback) => {
           console.log('=====onReady running')
-          setTimeout(() => cb(config), 0)
+          setTimeout(() => callback(config), 0)
         },
-        searchSymbols: (
+        searchSymbols: async (
           userInput,
           exchange,
           symbolType,
@@ -134,7 +95,7 @@ export default {
         ) => {
           console.log('====Search Symbols running')
         },
-        resolveSymbol: (
+        resolveSymbol: async (
           symbolName,
           onSymbolResolvedCallback,
           onResolveErrorCallback,
@@ -165,16 +126,15 @@ export default {
             console.log('Resolving that symbol....', symbol_stub)
           }, 0)
         },
-        getBars: function (
+        getBars: async (
           symbolInfo,
           resolution,
           periodParams,
           onHistoryCallback,
           onErrorCallback
-        ) {
+        ) => {
           console.log('=====getBars running')
-          historyProvider
-            .getBars(symbolInfo, resolution, periodParams)
+          await this.getHistoryData(symbolInfo, resolution, periodParams)
             .then((bars) => {
               if (bars.length) {
                 onHistoryCallback(bars, { noData: false })
@@ -228,28 +188,68 @@ export default {
       }
       return dataObj
     },
-    subscribeBars(
+    // get historical data
+    async getHistoryData(symbolInfo, resolution, periodParams) {
+      if (this.get_bar_list.includes(symbolInfo.name)) return []
+
+      this.get_bar_list.push(symbolInfo.name)
+      const { firstDataRequest, to, countBack } = periodParams
+      var split_symbol = symbolInfo.name.split(/[:/]/)
+      const params = {
+        fsym: split_symbol[0],
+        tsym: split_symbol[1],
+        // toTs: to,
+        // limit: 2000,
+        allData: true,
+        e: 'Binance',
+      }
+      const { data } = await OHLCV(params, 'histoday')
+      const his_data = data.Data.Data
+
+      console.log(his_data)
+      if (!his_data.length) return []
+      let bar_fliter = his_data.filter((el) => el.volumefrom !== 0)
+      let bars = bar_fliter.map((el) => {
+        return {
+          time: el.time * 1000, //TradingView requires bar time in ms
+          low: el.low,
+          high: el.high,
+          open: el.open,
+          close: el.close,
+          volume: el.volumefrom,
+        }
+      })
+      if (firstDataRequest) {
+        this.first_bar = bars[0]
+        this.last_bar = bars[bars.length - 1]
+      }
+      return bars
+    },
+    //
+    async subscribeBars(
       symbolInfo,
       resolution,
       onRealtimeCallback,
       uid,
       onResetCacheNeededCallback
     ) {
-      const channelString = this.createChannelString(symbolInfo)
+      this.resolution = resolution
+      this.onRealtimeCallback = onRealtimeCallback
+      // const channelString = this.createChannelString(symbolInfo)
 
-      let newSub = {
-        channelString,
-        uid,
-        resolution,
-        symbolInfo,
-        lastBar: historyProvider.history[symbolInfo.name].lastBar,
-        listener: onRealtimeCallback,
-      }
-      this.subs.push(newSub)
+      // let newSub = {
+      //   channelString,
+      //   uid,
+      //   resolution,
+      //   symbolInfo,
+      //   lastBar: historyProvider.history[symbolInfo.name].lastBar,
+      //   listener: onRealtimeCallback,
+      // }
+      // this.subs.push(newSub)
     },
     updateBar(data, sub) {
-      let lastBar = sub.lastBar
-      let resolution = sub.resolution
+      let lastBar = this.last_bar
+      let resolution = this.resolution
       // 1 day in minutes === 1440
       // 1 week in minutes === 10080
       resolution.includes('D')
@@ -261,7 +261,6 @@ export default {
       var coeff = resolution * 60
 
       var rounded = Math.floor(data.TS / coeff) * coeff
-
       var lastBarSec = lastBar.time / 1000
 
       var _lastBar = {}
@@ -276,19 +275,20 @@ export default {
           volume: data.TOTAL,
         }
         return _lastBar
+      } else {
+        // 마지막 캔들에  업데이트
+        data.P < lastBar.low
+          ? (lastBar.low = data.P)
+          : data.P > lastBar.high
+          ? (lastBar.high = data.P)
+          : null
+
+        lastBar.volume += data.Q
+        lastBar.close = data.P
+        _lastBar = lastBar
+
+        return _lastBar
       }
-      // 마지막 캔들에  업데이트
-      data.P < lastBar.low
-        ? (lastBar.low = data.P)
-        : data.P > lastBar.high
-        ? (lastBar.high = data.P)
-        : null
-
-      lastBar.volume += data.Q
-      lastBar.close = data.P
-      _lastBar = lastBar
-
-      return _lastBar
     },
     createChannelString(symbolInfo) {
       var channel = symbolInfo.name.split(/[:/]/)
@@ -305,11 +305,21 @@ export default {
       }
     },
   },
+  mounted() {
+    // chart init
+    this.createChart()
+    // this.tvWidget
+    //   .activeChart()
+    //   .setVisibleRange(
+    //     { from: this.first_bar.time },
+    //     { percentRightMargin: 20 }
+    //   )
+    //   .then(() => console.log('New visible range is applied'))
+  },
 }
 </script>
-
 <style lang="scss" scoped>
 .TVChartContainer {
-  height: calc(100vh - 80px);
+  height: 1000px;
 }
 </style>
