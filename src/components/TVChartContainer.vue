@@ -6,8 +6,7 @@
 
 <script>
 import { widget } from '../../public/charting_library'
-import historyProvider from '@/utils/historyProvider'
-import { mapState, mapGetters } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import { OHLCV } from '@/apis/cryptocompare'
 
 export default {
@@ -23,7 +22,6 @@ export default {
       fullscreen: false,
       autosize: true,
       studies_overrides: null,
-      subs: [],
       last_bar: null,
       first_bar: null,
       resolution: '',
@@ -37,18 +35,22 @@ export default {
     ...mapState('asset', ['TSYM']),
   },
   watch: {
-    // displayTrade(newValue) {
-    //   // 최산바 생성
-    //   let _lastBar = this.updateBar(newValue)
-    //   // 최신 바 업데이트
-    //   this.onRealtimeCallback(_lastBar)
-    // },
+    displayTrade(newValue) {
+      if (newValue.FSYM !== this.FSYM && newValue.TSYM !== this.TSYM) return
+      // 최산바 생성
+      let _lastBar = this.updateBar(newValue)
+      // 최신 바 업데이트
+      this.onRealtimeCallback(_lastBar)
+    },
     FSYM() {
       this.tvWidget.setSymbol(`${this.FSYM}/${this.TSYM}`, this.interval)
       this.get_bar_list = []
     },
   },
   methods: {
+    ...mapActions('socket', ['addChannelString']),
+    ...mapActions('socket', ['deleteChannelString']),
+
     //create chart
     createChart() {
       const widgetOptions = {
@@ -165,8 +167,7 @@ export default {
         },
         unsubscribeBars: (subscriberUID) => {
           console.log('=====unsubscribeBars running')
-
-          // stream.unsubscribeBars(subscriberUID)
+          this.unsubscribeBars(subscriberUID)
         },
         getMarks: (symbolInfo, from, to, onDataCallback, resolution) => {
           //optional
@@ -191,7 +192,7 @@ export default {
     // get historical data
     async getHistoryData(symbolInfo, resolution, periodParams) {
       if (this.get_bar_list.includes(symbolInfo.name)) return []
-
+      this.resolution = resolution
       this.get_bar_list.push(symbolInfo.name)
       const { firstDataRequest, to, countBack } = periodParams
       var split_symbol = symbolInfo.name.split(/[:/]/)
@@ -206,10 +207,9 @@ export default {
       const { data } = await OHLCV(params, 'histoday')
       const his_data = data.Data.Data
 
-      console.log(his_data)
       if (!his_data.length) return []
       let bar_fliter = his_data.filter((el) => el.volumefrom !== 0)
-      let bars = bar_fliter.map((el) => {
+      let bars = his_data.map((el) => {
         return {
           time: el.time * 1000, //TradingView requires bar time in ms
           low: el.low,
@@ -233,28 +233,33 @@ export default {
       uid,
       onResetCacheNeededCallback
     ) {
-      this.resolution = resolution
       this.onRealtimeCallback = onRealtimeCallback
-      // const channelString = this.createChannelString(symbolInfo)
+      let symbol_array = symbolInfo.name.split('/')
 
-      // let newSub = {
-      //   channelString,
-      //   uid,
-      //   resolution,
-      //   symbolInfo,
-      //   lastBar: historyProvider.history[symbolInfo.name].lastBar,
-      //   listener: onRealtimeCallback,
-      // }
-      // this.subs.push(newSub)
+      let sub_item = {
+        type: 0,
+        fsym: symbol_array[0],
+        tsym: symbol_array[1],
+      }
+      this.addChannelString(sub_item)
     },
-    updateBar(data, sub) {
+    unsubscribeBars(subscriberUID) {
+      // let UID_array = subscriberUID.slice(0, -5).split('/')
+      // let unsub_item = {
+      //   type: 0,
+      //   fsym: UID_array[0],
+      //   tsym: UID_array[1],
+      // }
+      // this.deleteChannelString(unsub_item)
+    },
+    updateBar(data) {
       let lastBar = this.last_bar
       let resolution = this.resolution
       // 1 day in minutes === 1440
       // 1 week in minutes === 10080
-      resolution.includes('D')
+      resolution.includes('1D')
         ? (resolution = 1440)
-        : resolution.includes('W')
+        : resolution.includes('1W')
         ? (resolution = 10080)
         : resolution
 
@@ -290,14 +295,6 @@ export default {
         return _lastBar
       }
     },
-    createChannelString(symbolInfo) {
-      var channel = symbolInfo.name.split(/[:/]/)
-      const exchange = symbolInfo.exchange
-      const to = channel[1]
-      const from = channel[0]
-      // subscribe to the CryptoCompare trade channel for the pair and exchange
-      return `0~${exchange}~${from}~${to}`
-    },
     destroyed() {
       if (this.tvWidget !== null) {
         this.tvWidget.remove()
@@ -308,13 +305,6 @@ export default {
   mounted() {
     // chart init
     this.createChart()
-    // this.tvWidget
-    //   .activeChart()
-    //   .setVisibleRange(
-    //     { from: this.first_bar.time },
-    //     { percentRightMargin: 20 }
-    //   )
-    //   .then(() => console.log('New visible range is applied'))
   },
 }
 </script>
