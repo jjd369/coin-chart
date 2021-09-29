@@ -28,7 +28,7 @@ export const mutations = {
       return el.title
     })
 
-    fsyms_list.length > 50 ? (fsyms_list.length = 50) : fsyms_list
+    fsyms_list.length > 40 ? (fsyms_list.length = 40) : fsyms_list
 
     state.FSYMS = fsyms_list.toString()
     state.fsyms_list = fsyms_list
@@ -70,8 +70,9 @@ export const actions = {
         let payload = {
           type: 2,
           fsyms: state.FSYMS,
+          tsym: state.TSYM,
         }
-        commit('socket/CREATE_CHANNEL_STRING', payload, {
+        dispatch('socket/addChannelString', payload, {
           root: true,
         })
       })
