@@ -58,18 +58,18 @@ export default {
     ...mapGetters('socket', ['displayTicker']),
   },
   watch: {
-    displayTicker(newVal) {
+    displayTicker(newValue) {
       let find_asset = find(this.coin_list, {
-        FROMSYMBOL: newVal.FROMSYMBOL,
+        FROMSYMBOL: newValue.FROMSYMBOL,
       })
       if (find_asset === undefined) return
-      if (!newVal.PRICE) return
+      if (!newValue.PRICE) return
 
-      find_asset.PRICE = newVal.PRICE
-      find_asset.FLAGS = newVal.FLAGS.toString()
+      find_asset.PRICE = newValue.PRICE
+      find_asset.FLAGS = newValue.FLAGS.toString()
 
       let find_asset_index = findIndex(this.coin_list, {
-        FROMSYMBOL: newVal.FROMSYMBOL,
+        FROMSYMBOL: newValue.FROMSYMBOL,
       })
       this.coin_list.splice(find_asset_index, 1, find_asset)
     },

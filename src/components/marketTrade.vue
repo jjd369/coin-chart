@@ -41,10 +41,10 @@ export default {
   },
   watch: {
     displayTrade(val) {
-      if (this.trade_list.length > 20) {
-        this.trade_list.shift()
-      }
-      this.trade_list.push(val)
+      // if (this.trade_list.length > 20) {
+      //   this.trade_list.shift()
+      // }
+      // this.trade_list.push(val)
     },
   },
   methods: {

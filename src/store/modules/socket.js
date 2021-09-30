@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import _ from 'lodash'
 
 export const state = {
@@ -36,7 +37,6 @@ export const mutations = {
     }
   },
   DELETE_CHANNEL_STRING(state, payload) {
-    console.log(`${payload.type}~Binance~${payload.fsym}~${payload.tsym}`)
     let delect_channel_index = state.channel_string.findIndex(
       (el) => el === `${payload.type}~Binance~${payload.fsym}~${payload.tsym}`
     )
@@ -44,7 +44,9 @@ export const mutations = {
   },
   ADD_MESSAGE(state, message) {
     if (message.TYPE === '8') state.order_book = message
-    if (message.TYPE === '0') state.trade = message
+    if (message.TYPE === '0') {
+      Vue.set(state.trade, [`${message.FSYM}/${message.TSYM}`], message)
+    }
     if (message.TYPE === '2') state.ticker = message
   },
 
