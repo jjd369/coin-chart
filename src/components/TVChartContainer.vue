@@ -31,7 +31,6 @@ export default {
   },
   computed: {
     ...mapGetters('socket', ['displayTrade']),
-
     ...mapState('asset', ['FSYM']),
     ...mapState('asset', ['TSYM']),
   },
@@ -40,9 +39,11 @@ export default {
       deep: true,
       handler(newValue) {
         let new_data = newValue[`${this.FSYM}/${this.TSYM}`]
-
+        if (!new_data) return
+        if (`${this.FSYM}/${this.TSYM}` !== `${new_data.FSYM}/${new_data.TSYM}`)
+          return
         // 최산바 생성
-        let _lastBar = this.testUpdate(new_data)
+        let _lastBar = this.updateBar(new_data)
         // 최신 바 업데이트
         this.onRealtimeCallback(_lastBar)
       },
@@ -213,7 +214,6 @@ export default {
       const his_data = data.Data.Data
 
       if (!his_data.length) return []
-      let bar_fliter = his_data.filter((el) => el.volumefrom !== 0)
       let bars = his_data.map((el) => {
         return {
           time: el.time * 1000, //TradingView requires bar time in ms
@@ -257,58 +257,43 @@ export default {
       }
       this.deleteChannelString(unsub_item)
     },
-    // updateBar(data) {
-    //   let lastBar = this.last_bar
-    //   let resolution = this.resolution
-    //   // 1 day in minutes === 1440
-    //   // 1 week in minutes === 10080
-    //   resolution.includes('1D')
-    //     ? (resolution = 1440)
-    //     : resolution.includes('1W')
-    //     ? (resolution = 10080)
-    //     : resolution
+    updateBar(data) {
+      let lastBar = this.last_bar
+      let resolution = this.resolution
+      var lastBarSec = lastBar.time / 1000
+      let nextBarTime = this.getNextBarTime(lastBarSec, resolution)
 
-    //   var coeff = resolution * 60
-
-    //   var rounded = Math.floor(data.TS / coeff) * coeff
-    //   var lastBarSec = lastBar.time / 1000
-
-    //   var _lastBar = {}
-    //   // 새로운 캔들에 업데이트
-    //   if (rounded > lastBarSec) {
-    //     _lastBar = {
-    //       time: rounded * 1000,
-    //       open: lastBar.close,
-    //       high: lastBar.close,
-    //       low: lastBar.close,
-    //       close: data.P,
-    //       volume: data.Q,
-    //     }
-    //     return _lastBar
-    //   } else {
-    //     // 마지막 캔들에  업데이트
-    //     data.P < lastBar.low
-    //       ? (lastBar.low = data.P)
-    //       : data.P > lastBar.high
-    //       ? (lastBar.high = data.P)
-    //       : null
-
-    //     lastBar.volume += data.Q
-    //     lastBar.close = data.P
-    //     _lastBar = lastBar
-
-    //     return _lastBar
-    //   }
-    // },
+      var bar = {}
+      if (data.TS >= nextBarTime) {
+        // console.log('새로운 캔들 만들기')
+        bar = {
+          time: nextBarTime * 1000,
+          open: lastBar.close,
+          high: lastBar.close,
+          low: lastBar.close,
+          close: data.P,
+          volume: data.Q,
+        }
+      } else {
+        // console.log('기존캔들 업데이트')
+        bar = {
+          time: data.TS * 1000,
+          open: lastBar.open,
+          high: Math.max(lastBar.high, data.P),
+          low: Math.min(lastBar.low, data.P),
+          close: data.P,
+          volume: data.TOTAL,
+        }
+      }
+      this.last_bar = bar
+      return bar
+    },
     testUpdate(val) {
       const last_daily_Bar = this.last_bar
       const next_daily_bar_time = this.getNextDailyBarTime(last_daily_Bar.time)
-      var tomorrow = new Date()
-      tomorrow.setDate(tomorrow.getDate() + 1)
-      console.log(tomorrow)
-      console.log(last_daily_Bar.time)
-      console.log(next_daily_bar_time)
-      console.log(val.TS * 1000)
+      console.log('last_bar.time' + last_daily_Bar.time)
+      console.log('next_bar.time' + next_daily_bar_time)
+      console.log('val.TS' + val.TS * 1000)
       const tradeTime = val.TS * 1000
       console.log(tradeTime >= next_daily_bar_time)
       let bar
@@ -323,7 +308,8 @@ export default {
         console.log('[socket] Generate new bar', bar)
       } else {
         bar = {
-          ...last_daily_Bar,
+          time: last_daily_Bar.time,
+          open: last_daily_Bar.open,
           high: Math.max(last_daily_Bar.high, val.P),
           low: Math.min(last_daily_Bar.low, val.P),
           close: val.P,
@@ -333,11 +319,30 @@ export default {
       this.last_bar = bar
       return bar
     },
-    getNextDailyBarTime(barTime) {
+    getNextBarTime(barTime, resolution) {
       const date = new Date(barTime)
-      date.setDate(date.getDate() + 1)
-      return date.getTime()
+      const tomorrow = new Date(date)
+
+      if (resolution.includes('D')) {
+        tomorrow.setDate(tomorrow.getDate() + 1)
+        tomorrow.setHours(0, 0, 0, 0)
+        return tomorrow.getTime()
+      }
+
+      if (resolution.includes('W')) {
+        tomorrow.setDate(tomorrow.getDate() + 7)
+        tomorrow.setHours(0, 0, 0, 0)
+        return tomorrow.getTime()
+      }
+
+      if (resolution.includes('M')) {
+        tomorrow.setMonth(tomorrow.getMonth() + 1)
+        tomorrow.setDate(1)
+        tomorrow.setHours(0, 0, 0, 0)
+        return tomorrow.getTime()
+      }
     },
+
     destroyed() {
       if (this.tvWidget !== null) {
         this.tvWidget.remove()
