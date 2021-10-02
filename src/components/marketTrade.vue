@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 export default {
   data() {
     return {
@@ -38,13 +38,25 @@ export default {
   },
   computed: {
     ...mapGetters('socket', ['displayTrade']),
+    ...mapState('asset', ['FSYM']),
+    ...mapState('asset', ['TSYM']),
   },
   watch: {
-    displayTrade(val) {
-      // if (this.trade_list.length > 20) {
-      //   this.trade_list.shift()
-      // }
-      // this.trade_list.push(val)
+    displayTrade: {
+      deep: true,
+      handler(newValue) {
+        if (this.trade_list.length > 20) this.trade_list.shift()
+
+        let new_data = newValue[`${this.FSYM}/${this.TSYM}`]
+        if (!new_data) return
+
+        if (`${this.FSYM}/${this.TSYM}` !== `${new_data.FSYM}/${new_data.TSYM}`)
+          return
+        this.trade_list.push(new_data)
+      },
+    },
+    FSYM() {
+      this.trade_list = []
     },
   },
   methods: {
