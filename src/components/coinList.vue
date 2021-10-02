@@ -76,6 +76,10 @@ export default {
   },
   methods: {
     changeAsset(FSYM, TSYM) {
+      this.$store.commit('common/ON_LOADING')
+      setTimeout(() => {
+        this.$store.commit('common/OFF_LOADING')
+      }, 2000)
       this.$store.dispatch('asset/updateSymbol', { FSYM: FSYM, TSYM: TSYM })
     },
     calculatePrice(price) {
@@ -94,7 +98,7 @@ export default {
 
 <style lang="scss" module>
 .coinListWrap {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   .titleWrap {
     display: flex;
     align-items: center;
