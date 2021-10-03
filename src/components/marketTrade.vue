@@ -77,7 +77,7 @@ export default {
   span {
     display: flex;
     flex: 1 1 0%;
-    padding-left: 1em;
+    padding-left: 50px;
     padding-top: 10px;
     padding-bottom: 10px;
   }
@@ -94,7 +94,7 @@ export default {
   span {
     display: flex;
     flex: 1 1 0%;
-    padding-left: 1em;
+    padding-left: 50px;
     padding-top: 10px;
     padding-bottom: 10px;
   }

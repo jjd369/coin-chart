@@ -17,37 +17,18 @@ export const getters = {
 }
 
 export const mutations = {
-  CREATE_CHANNEL_STRING(state, payload) {
-    let channel_string
-
-    if (payload.type === 2) {
-      channel_string = _.chain(payload.fsyms)
-        .split(',')
-        .map((el) => {
-          return `${payload.type}~Binance~${el}~${payload.tsym}`
-        })
-        .value()
-      state.channel_string = [...state.channel_string, ...channel_string]
-    }
-
-    if (payload.type === 0) {
-      channel_string = `${payload.type}~Binance~${payload.fsym}~${payload.tsym}`
-
-      state.channel_string.push(channel_string)
-    }
+  CREATE_CHANNEL_STRING(state, newValue) {
+    state.channel_string = [...state.channel_string, ...newValue]
   },
-  DELETE_CHANNEL_STRING(state, payload) {
-    let delect_channel_index = state.channel_string.findIndex(
-      (el) => el === `${payload.type}~Binance~${payload.fsym}~${payload.tsym}`
-    )
-    state.channel_string.splice(delect_channel_index, 1)
+  DELETE_CHANNEL_STRING(state, channelIndex) {
+    state.channel_string.splice(channelIndex, 1)
   },
-  ADD_MESSAGE(state, message) {
-    if (message.TYPE === '8') state.order_book = message
-    if (message.TYPE === '0') {
-      Vue.set(state.trade, [`${message.FSYM}/${message.TSYM}`], message)
+  ADD_MESSAGE(state, data) {
+    if (data.TYPE === '8') state.order_book = data
+    if (data.TYPE === '0') {
+      Vue.set(state.trade, [`${data.FSYM}/${data.TSYM}`], data)
     }
-    if (message.TYPE === '2') state.ticker = message
+    if (data.TYPE === '2') state.ticker = data
   },
 
   SET_CONNECTION(state, message) {
@@ -63,9 +44,29 @@ export const actions = {
     commit('SET_CONNECTION', true)
   },
   addChannelString({ commit }, message) {
-    commit('CREATE_CHANNEL_STRING', message)
+    let channel_string
+
+    if (message.type === 2) {
+      channel_string = _.chain(message.fsyms)
+        .split(',')
+        .map((el) => {
+          return `${message.type}~Binance~${el}~${message.tsym}`
+        })
+        .value()
+    }
+
+    if (message.type === 0) {
+      channel_string = [
+        `${message.type}~Binance~${message.fsym}~${message.tsym}`,
+      ]
+    }
+
+    commit('CREATE_CHANNEL_STRING', channel_string)
   },
   deleteChannelString({ commit }, message) {
-    commit('DELETE_CHANNEL_STRING', message)
+    let delect_channel_index = state.channel_string.findIndex(
+      (el) => el === `${message.type}~Binance~${message.fsym}~${message.tsym}`
+    )
+    commit('DELETE_CHANNEL_STRING', delect_channel_index)
   },
 }

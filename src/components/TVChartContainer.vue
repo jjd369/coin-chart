@@ -210,11 +210,14 @@ export default {
         allData: true,
         e: 'Binance',
       }
-      const { data } = await OHLCV(params, 'histoday')
-      const his_data = data.Data.Data
+      const {
+        data: {
+          Data: { Data },
+        },
+      } = await OHLCV(params, 'histoday')
 
-      if (!his_data.length) return []
-      let bars = his_data.map((el) => {
+      if (!Data.length) return []
+      let bars = Data.map((el) => {
         return {
           time: el.time * 1000, //TradingView requires bar time in ms
           low: el.low,
