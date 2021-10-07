@@ -4,12 +4,10 @@
       <div :class="$style.row">
         <div :class="$style.col">
           <span>{{ FSYM }} / {{ TSYM }}</span>
-          <span :class="trade.FLAGS === '1' ? $style.green : $style.red">{{
+          <span :class="[trade.FLAGS === '1' ? $style.green : $style.red]">{{
             trade.P
           }}</span>
         </div>
-      </div>
-      <div :class="$style.row">
         <div :class="$style.col">
           <span>Change </span>
           <span
@@ -48,12 +46,8 @@ import Decimal from 'decimal.js'
 export default {
   data() {
     return {
-      openDay: '',
-      coin_info: null,
-      high: '',
-      low: '',
-      trade: null,
-      loading: false,
+      coin_info: {},
+      trade: {},
     }
   },
   computed: {
@@ -63,22 +57,18 @@ export default {
     ...mapGetters('socket', ['displayTicker']),
     ...mapGetters('socket', ['displayTrade']),
     c_find_data() {
-      return find(this.assets_full_data, {
-        FROMSYMBOL: this.FSYM,
-        TOSYMBOL: this.TSYM,
-      })
-    },
-    c_high() {
-      return this.c_find_data.HIGH24HOUR
-    },
-    c_low() {
-      return this.c_find_data.LOW24HOUR
+      return (
+        find(this.assets_full_data, {
+          FROMSYMBOL: this.FSYM,
+          TOSYMBOL: this.TSYM,
+        }) || {}
+      )
     },
     c_compare_high() {
-      return Math.max(this.c_high, this.trade.P)
+      return Math.max(this.c_find_data.HIGH24HOUR, this.trade.P)
     },
     c_compare_low() {
-      return Math.max(this.c_low, this.trade.P)
+      return Math.max(this.c_find_data.LOW24HOUR, this.trade.P)
     },
     c_openDay() {
       return this.c_find_data.OPENDAY
@@ -96,16 +86,17 @@ export default {
       handler(newValue) {
         let new_data = newValue[`${this.FSYM}/${this.TSYM}`]
         if (!new_data) return
-        if (`${this.FSYM}/${this.TSYM}` !== `${new_data.FSYM}/${new_data.TSYM}`)
-          return
 
         this.trade = new_data
       },
     },
-    FSYM() {},
+  },
+  mounted() {
+    console.log(this.assets_full_data)
   },
   methods: {
     calculateChangeDay(openDay, price) {
+      if (!openDay || !price) return
       return Decimal.sub(price, openDay).div(openDay).mul(100).toFixed(2)
     },
     Decimal,
@@ -116,24 +107,25 @@ export default {
 <style lang="scss" module>
 .mainBarWrap {
   display: flex;
-  padding: 10px;
+  padding: 15px;
   margin-bottom: 20px;
   .row {
     display: flex;
     .col {
       display: flex;
       flex-direction: column;
-      padding: 0 30px;
-      span {
-        &:first-child {
-          padding-bottom: 10px;
-        }
+      justify-content: space-around;
+      flex: 1 1 0;
+      padding-right: 50px;
+      min-width: 100px;
+      &:nth-child(n + 5) {
+        min-width: 150px;
       }
       .green {
-        color: #0ecb81;
+        color: $green;
       }
       .red {
-        color: #f6465d;
+        color: $red;
       }
     }
   }
