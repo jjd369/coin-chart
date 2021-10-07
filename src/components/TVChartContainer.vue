@@ -40,8 +40,7 @@ export default {
       handler(newValue) {
         let new_data = newValue[`${this.FSYM}/${this.TSYM}`]
         if (!new_data) return
-        if (`${this.FSYM}/${this.TSYM}` !== `${new_data.FSYM}/${new_data.TSYM}`)
-          return
+
         // 최산바 생성
         let _lastBar = this.updateBar(new_data)
         // 최신 바 업데이트
@@ -49,6 +48,10 @@ export default {
       },
     },
     FSYM() {
+      this.tvWidget.setSymbol(`${this.FSYM}/${this.TSYM}`, this.interval)
+      this.get_bar_list = []
+    },
+    TSYM() {
       this.tvWidget.setSymbol(`${this.FSYM}/${this.TSYM}`, this.interval)
       this.get_bar_list = []
     },
@@ -246,19 +249,21 @@ export default {
 
       let sub_item = {
         type: 0,
-        fsym: symbol_array[0],
+        fsyms: [symbol_array[0]],
         tsym: symbol_array[1],
       }
       this.addChannelString(sub_item)
     },
     unsubscribeBars(subscriberUID) {
       let UID_array = subscriberUID.slice(0, -5).split('/')
-      let unsub_item = {
+
+      let sub_remove_obj = {
         type: 0,
-        fsym: UID_array[0],
+        fsyms: [UID_array[0]],
         tsym: UID_array[1],
       }
-      this.deleteChannelString(unsub_item)
+
+      this.deleteChannelString(sub_remove_obj)
     },
     updateBar(data) {
       let lastBar = this.last_bar
@@ -287,37 +292,6 @@ export default {
           close: data.P,
           volume: data.TOTAL,
         }
-      }
-      this.last_bar = bar
-      return bar
-    },
-    testUpdate(val) {
-      const last_daily_Bar = this.last_bar
-      const next_daily_bar_time = this.getNextDailyBarTime(last_daily_Bar.time)
-      console.log('last_bar.time' + last_daily_Bar.time)
-      console.log('next_bar.time' + next_daily_bar_time)
-      console.log('val.TS' + val.TS * 1000)
-      const tradeTime = val.TS * 1000
-      console.log(tradeTime >= next_daily_bar_time)
-      let bar
-      if (tradeTime >= next_daily_bar_time) {
-        bar = {
-          time: next_daily_bar_time,
-          open: val.P,
-          high: val.P,
-          low: val.P,
-          close: val.P,
-        }
-        console.log('[socket] Generate new bar', bar)
-      } else {
-        bar = {
-          time: last_daily_Bar.time,
-          open: last_daily_Bar.open,
-          high: Math.max(last_daily_Bar.high, val.P),
-          low: Math.min(last_daily_Bar.low, val.P),
-          close: val.P,
-        }
-        console.log('[socket] Update the latest bar by price', val.P)
       }
       this.last_bar = bar
       return bar
