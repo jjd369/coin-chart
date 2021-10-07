@@ -1,14 +1,14 @@
 <template>
   <div>
     <el-row :gutter="40">
-      <el-col :span="18"
+      <el-col :lg="17" :xl="18"
         ><div>
           <mainBar></mainBar>
           <TVChartContainer></TVChartContainer>
         </div>
         <div><orderBook></orderBook></div
       ></el-col>
-      <el-col :span="6"
+      <el-col :lg="7" :xl="6"
         ><div> <coinList></coinList> <marketTrade></marketTrade></div
       ></el-col>
     </el-row>
