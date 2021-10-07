@@ -1,14 +1,14 @@
 <template>
-  <div class="boxLine">
+  <div class="boxLine" :class="$style.tradeWrap">
     <div :class="$style.titleWrap">
-      <span>Price()</span>
-      <span>Amount()</span>
+      <span>Price({{ TSYM }})</span>
+      <span>Amount({{ FSYM }})</span>
       <span>Time</span>
     </div>
     <div>
       <ul :class="$style.contentWrap">
-        <perfect-scrollbar>
-          <template v-for="(arr, index) in trade_list">
+        <perfect-scrollbar :class="$style.ps">
+          <template v-for="(arr, index) in c_reverse_trade_list">
             <li :key="index" :class="$style.listWrap">
               <span
                 :class="[arr.F === '1' ? $style.red : $style.green]"
@@ -40,6 +40,9 @@ export default {
     ...mapGetters('socket', ['displayTrade']),
     ...mapState('asset', ['FSYM']),
     ...mapState('asset', ['TSYM']),
+    c_reverse_trade_list() {
+      return this.trade_list.slice(0).reverse()
+    },
   },
   watch: {
     displayTrade: {
@@ -50,8 +53,6 @@ export default {
         let new_data = newValue[`${this.FSYM}/${this.TSYM}`]
         if (!new_data) return
 
-        if (`${this.FSYM}/${this.TSYM}` !== `${new_data.FSYM}/${new_data.TSYM}`)
-          return
         this.trade_list.push(new_data)
       },
     },
@@ -71,20 +72,41 @@ export default {
 </script>
 
 <style lang="scss" module>
+.tradeWrap {
+  min-height: 235px;
+  padding: 10px;
+  .ps {
+    height: 338px;
+  }
+}
 .titleWrap {
   display: flex;
   align-items: center;
+  padding: 10px;
   span {
     display: flex;
-    flex: 1 1 0%;
-    padding-left: 50px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    &:nth-child(1) {
+      flex: 5 1 0px;
+      justify-content: flex-start;
+      min-width: 120px;
+    }
+    &:nth-child(2) {
+      flex: 3 1 0px;
+      justify-content: flex-end;
+      min-width: 50px;
+    }
+    &:nth-child(3) {
+      flex: 3 1 0px;
+      justify-content: flex-end;
+      min-width: 60px;
+    }
   }
 }
 .listWrap {
   display: flex;
   align-items: center;
+  padding: 0 5px 15px 5px;
+
   &:hover {
     cursor: pointer;
   }
@@ -93,16 +115,27 @@ export default {
   }
   span {
     display: flex;
-    flex: 1 1 0%;
-    padding-left: 50px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    &:nth-child(1) {
+      flex: 5 1 0px;
+      justify-content: flex-start;
+      min-width: 120px;
+    }
+    &:nth-child(2) {
+      flex: 3 1 0px;
+      justify-content: flex-end;
+      min-width: 50px;
+    }
+    &:nth-child(3) {
+      flex: 3 1 0px;
+      justify-content: flex-end;
+      min-width: 60px;
+    }
   }
   .green {
-    color: #0ecb81;
+    color: $green;
   }
   .red {
-    color: #f6465d;
+    color: $red;
   }
 }
 </style>
