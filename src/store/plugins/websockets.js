@@ -18,16 +18,14 @@ export default function createWebSocketPlugin() {
       if (mutation.type === 'socket/CREATE_CHANNEL_STRING') {
         let subRequest = {
           action: 'SubAdd',
-          subs: store.state.socket.channel_string,
+          subs: mutation.payload,
         }
         socket.send(JSON.stringify(subRequest))
       }
       if (mutation.type === 'socket/DELETE_CHANNEL_STRING') {
         let unSubRequest = {
           action: 'SubRemove',
-          subs: [
-            `${mutation.payload.type}~Binance~${mutation.payload.fsym}~${mutation.payload.tsym}`,
-          ],
+          subs: mutation.payload,
         }
         socket.send(JSON.stringify(unSubRequest))
       }
