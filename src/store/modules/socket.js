@@ -20,8 +20,12 @@ export const mutations = {
   CREATE_CHANNEL_STRING(state, newValue) {
     state.channel_string = [...state.channel_string, ...newValue]
   },
-  DELETE_CHANNEL_STRING(state, channelIndex) {
-    state.channel_string.splice(channelIndex, 1)
+  DELETE_CHANNEL_STRING(state, message) {
+    let index
+    message.forEach((el) => {
+      index = state.channel_string.findIndex((arr) => arr === el)
+      state.channel_string.splice(index, 1)
+    })
   },
   ADD_MESSAGE(state, data) {
     if (data.TYPE === '8') state.order_book = data
@@ -43,30 +47,18 @@ export const actions = {
   connectionOpened({ commit }) {
     commit('SET_CONNECTION', true)
   },
-  addChannelString({ commit }, message) {
-    let channel_string
-
-    if (message.type === 2) {
-      channel_string = _.chain(message.fsyms)
-        .split(',')
-        .map((el) => {
-          return `${message.type}~Binance~${el}~${message.tsym}`
-        })
-        .value()
-    }
-
-    if (message.type === 0) {
-      channel_string = [
-        `${message.type}~Binance~${message.fsym}~${message.tsym}`,
-      ]
-    }
-
-    commit('CREATE_CHANNEL_STRING', channel_string)
+  addChannelString({ commit }, { type, fsyms, tsym }) {
+    let create_string = []
+    fsyms.forEach((el) => {
+      create_string.push(`${type}~Binance~${el}~${tsym}`)
+    })
+    commit('CREATE_CHANNEL_STRING', create_string)
   },
-  deleteChannelString({ commit }, message) {
-    let delect_channel_index = state.channel_string.findIndex(
-      (el) => el === `${message.type}~Binance~${message.fsym}~${message.tsym}`
-    )
-    commit('DELETE_CHANNEL_STRING', delect_channel_index)
+  deleteChannelString({ commit }, { type, fsyms, tsym }) {
+    let create_string = []
+    fsyms.forEach((el) => {
+      create_string.push(`${type}~Binance~${el}~${tsym}`)
+    })
+    commit('DELETE_CHANNEL_STRING', create_string)
   },
 }
