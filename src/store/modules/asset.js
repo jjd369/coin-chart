@@ -7,6 +7,7 @@ export const state = {
   FSYM: 'BTC',
   TSYM: 'USDT',
   FSYMS: '',
+  TSYMS: 'BTC,ETH,USDT',
   fsyms_list: {},
   binance_assets_list: {},
   assets_full_data: [],
@@ -27,9 +28,16 @@ export const mutations = {
     state.binance_assets_list = newValue
   },
   SET_SYMBOLS_FULL_DATA(state, data) {
-    for (const key in data) {
-      state.assets_full_data.push(data[key][`${state.TSYM}`])
-    }
+    state.assets_full_data = data
+  },
+  SET_FAVORITE(state, newValue) {
+    let index = state.assets_full_data.findIndex((el) => el === newValue)
+    newValue.like = !newValue.like
+    state.assets_full_data.splice(index, 1, newValue)
+  },
+  UPDATE_SYMBOL_FULL_DATA(state, newValue) {
+    let index = state.assets_full_data.findIndex((el) => el === newValue)
+    state.assets_full_data.splice(index, 1, newValue)
   },
 }
 
@@ -38,13 +46,16 @@ export const actions = {
     try {
       const coins = await dispatch('getCoinList')
       const fsyms = await dispatch('getFsymsList', coins)
-      await dispatch('getSymbolsFullData', fsyms.toString())
-
+      await dispatch('getSymbolsFullData', {
+        fsyms: fsyms.toString(),
+        tsyms: state.TSYMS,
+      })
       let payload = {
         type: 2,
-        fsyms: fsyms.toString(),
+        fsyms: fsyms,
         tsym: state.TSYM,
       }
+
       dispatch('socket/addChannelString', payload, {
         root: true,
       })
@@ -77,32 +88,41 @@ export const actions = {
 
     return new_binance_assets_list
   },
-  async getFsymsList({ commit, state }, coins) {
-    let fsyms = filter(coins, (el) => {
-      return el.tsyms.includes(state.TSYM)
-    })
-
-    let fsyms_list = map(fsyms, (el) => {
+  async getFsymsList({ commit }, coins) {
+    let fsyms_list = map(coins, (el) => {
       return el.title
     })
-
     fsyms_list.length > 40 ? (fsyms_list.length = 40) : fsyms_list
-
     commit('SET_FSYMS_LIST', fsyms_list)
 
     return fsyms_list
   },
-  async getSymbolsFullData({ commit, state }, fsyms) {
+  async getSymbolsFullData({ commit }, { fsyms, tsyms }) {
     const {
       data: { RAW },
     } = await fetchSymbolsFullData({
       fsyms,
-      tsyms: state.TSYM,
+      tsyms,
       e: 'binance',
     })
-    commit('SET_SYMBOLS_FULL_DATA', RAW)
+    let row_array = []
+    Object.values(RAW).forEach((el) => {
+      for (const prop in el) {
+        row_array.push(el[prop])
+      }
+    })
+    const add_like_row_array = map(row_array, (el) => {
+      return { ...el, like: false }
+    })
+    commit('SET_SYMBOLS_FULL_DATA', add_like_row_array)
   },
   updateSymbol({ commit }, newValue) {
     commit('SET_SYMBOL', newValue)
+  },
+  updateFavorit({ commit }, newValue) {
+    commit('SET_FAVORITE', newValue)
+  },
+  updateSymbolFullData({ commit }, newValue) {
+    commit('UPDATE_SYMBOL_FULL_DATA', newValue)
   },
 }
