@@ -21,20 +21,14 @@ export default {
 <style lang="scss" scoped>
 .el-header,
 .el-footer {
-  background-color: #ededed;
-  color: #333;
+  background-color: #293335;
+  color: #91abaa;
   text-align: center;
   line-height: 60px;
 }
-
-.el-aside {
-  background-color: #d3dce6;
-  color: #333;
-  text-align: center;
-  line-height: 200px;
-}
 body > .el-container {
   margin-bottom: 40px;
+  background: #f9f9f9;
 }
 
 .el-container:nth-child(5) .el-aside,

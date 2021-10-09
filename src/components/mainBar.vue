@@ -111,12 +111,14 @@ export default {
   margin-bottom: 20px;
   .row {
     display: flex;
+    flex-wrap: wrap;
     .col {
       display: flex;
       flex-direction: column;
       justify-content: space-around;
       flex: 1 1 0;
-      padding-right: 50px;
+      padding-right: 30px;
+      line-height: 30px;
       min-width: 100px;
       &:nth-child(n + 5) {
         min-width: 150px;
