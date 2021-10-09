@@ -1,10 +1,8 @@
 <template>
   <el-container>
-    <!-- <el-header>for portfolio</el-header> -->
-    <el-container>
-      <el-main><Main></Main></el-main>
-      <el-footer> For Jang Jong-doo's portfolio </el-footer>
-    </el-container>
+    <el-header>Site created based on Binance trading information </el-header>
+    <el-main><Main></Main></el-main>
+    <el-footer> For Jang Jong-doo's portfolio </el-footer>
   </el-container>
 </template>
 

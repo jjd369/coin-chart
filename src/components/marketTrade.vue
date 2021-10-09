@@ -76,7 +76,7 @@ export default {
   min-height: 235px;
   padding: 10px;
   .ps {
-    height: 338px;
+    height: 361px;
   }
 }
 .titleWrap {
