@@ -239,14 +239,6 @@ export default {
                 this.search_coin.toLowerCase()
               )
           )
-      // return filter(
-      //   this.c_filter_tab_list,
-      //   (el) =>
-      //     !this.search_coin ||
-      //     `${el.FROMSYMBOL.toLowerCase()}/${el.TOSYMBOL.toLowerCase()}`.includes(
-      //       this.search_coin.toLowerCase()
-      //     )
-      // )
     },
     c_like_list() {
       return filter(this.assets_full_data, { like: true })

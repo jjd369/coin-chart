@@ -6,4 +6,14 @@ module.exports = {
       },
     },
   },
+  devServer: {
+    proxy: {
+      '/api': {
+        target: 'https://min-api.cryptocompare.com/data',
+        changeOrigin: true,
+        pathRewrite: { '^/api': '' },
+      },
+    },
+    headers: { 'Access-Control-Allow-Origin': '*' },
+  },
 }
