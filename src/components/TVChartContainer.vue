@@ -1,5 +1,5 @@
 <template>
-  <div class="boxLine">
+  <div class="chartWrap boxLine">
     <div class="TVChartContainer" :id="container_id" />
   </div>
 </template>
@@ -76,6 +76,7 @@ export default {
           'timeframes_toolbar',
           'header_compare',
         ],
+        enabled_features: ['hide_left_toolbar_by_default'],
         clientId: this.client_id,
         userId: this.user_id,
         fullscreen: this.fullscreen,
@@ -124,7 +125,7 @@ export default {
             ticker: symbolName,
             exchange: 'Binance',
             minmov: 1,
-            pricescale: 100000000,
+            pricescale: 100,
             has_intraday: true,
             intraday_multipliers: ['1', '60'],
             supported_resolution: supportedResolutions,
@@ -336,5 +337,13 @@ export default {
 <style lang="scss" scoped>
 .TVChartContainer {
   height: 1000px;
+}
+@media (max-width: 767px) {
+  .TVChartContainer {
+    height: 500px;
+  }
+  .chartWrap {
+    margin-bottom: 20px;
+  }
 }
 </style>

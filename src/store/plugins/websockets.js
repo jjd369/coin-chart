@@ -1,16 +1,13 @@
-let apiKey = '917c161eac7536a4d1790a0d5468eac451a6737add2557c599f1c988a0c614eb'
-const socket = new WebSocket(
-  'wss://streamer.cryptocompare.com/v2?api_key=' + apiKey
-)
+var apiKey = '917c161eac7536a4d1790a0d5468eac451a6737add2557c599f1c988a0c614eb'
+var socket
+
+startWebsocket()
 
 export default function createWebSocketPlugin() {
   return (store) => {
-    socket.onopen = () => {
-      store.dispatch('socket/connectionOpened')
-    }
-
+    // socket
     socket.onmessage = (message) => {
-      var data = JSON.parse(message.data)
+      let data = JSON.parse(message.data)
       store.dispatch('socket/addMessage', data)
     }
 
@@ -20,6 +17,7 @@ export default function createWebSocketPlugin() {
           action: 'SubAdd',
           subs: mutation.payload,
         }
+
         socket.send(JSON.stringify(subRequest))
       }
       if (mutation.type === 'socket/DELETE_CHANNEL_STRING') {
@@ -30,5 +28,17 @@ export default function createWebSocketPlugin() {
         socket.send(JSON.stringify(unSubRequest))
       }
     })
+  }
+}
+
+function startWebsocket() {
+  socket = new WebSocket(
+    'wss://streamer.cryptocompare.com/v2?api_key=' + apiKey
+  )
+  // socket.onopen = () => {}
+  socket.onclose = () => {
+    // connection closed, discard old websocket and create a new one in 5s
+    socket = null
+    setTimeout(startWebsocket, 5000)
   }
 }

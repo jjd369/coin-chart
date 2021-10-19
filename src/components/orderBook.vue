@@ -34,7 +34,6 @@
 <script>
 import { getOrderBook } from '@/apis/cryptocompare'
 import { mapState, mapGetters } from 'vuex'
-
 // import find from 'lodash/find'
 export default {
   data() {
@@ -84,9 +83,9 @@ export default {
     },
   },
   mounted() {
-    Promise.all([this.getOrderBook()]).catch((e) => {
-      console.log(e)
-    })
+    // Promise.all([this.getOrderBook()]).catch((e) => {
+    //   console.log(e)
+    // })
   },
 }
 </script>

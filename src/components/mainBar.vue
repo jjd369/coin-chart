@@ -132,4 +132,14 @@ export default {
     }
   }
 }
+
+@media (max-width: 767px) {
+  .mainBarWrap {
+    .row {
+      .col {
+        padding-right: 0;
+      }
+    }
+  }
+}
 </style>

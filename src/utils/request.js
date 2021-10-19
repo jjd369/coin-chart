@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const instance = axios.create({
-  baseURL: '/api',
+  baseURL: 'https://min-api.cryptocompare.com/data',
   timeout: 3000,
 })
 
