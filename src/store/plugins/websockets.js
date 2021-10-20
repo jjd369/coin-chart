@@ -1,48 +1,55 @@
-// ws.onclose = () => {
-//   // connection closed, discard old websocket and create a new one in 5s
-//   console.log(socket)
-//   socket = null
-//   setTimeout(
-//     (socket = new WebSocket(
-//       'wss://streamer.cryptocompare.com/v2?api_key=' + apiKey
-//     )),
-//     5000
-//   )
-// }
-
 export default function createWebSocketPlugin() {
-  return (store) => {
-    // socket connect
-    startWebsocket()
-      .then((ws) => {
-        // onmessage
+  return async (store) => {
+    try {
+      // socket connect
+      var ws = await startWebsocket()
+
+      // onmessage
+      ws.onmessage = (message) => {
+        let data = JSON.parse(message.data)
+        store.dispatch('socket/addMessage', data)
+      }
+
+      store.subscribe((mutation) => {
+        // create the channel string
+        if (mutation.type === 'socket/CREATE_CHANNEL_STRING') {
+          let subRequest = {
+            action: 'SubAdd',
+            subs: mutation.payload,
+          }
+
+          ws.send(JSON.stringify(subRequest))
+        }
+
+        // delete the channel string
+        if (mutation.type === 'socket/DELETE_CHANNEL_STRING') {
+          let unSubRequest = {
+            action: 'SubRemove',
+            subs: mutation.payload,
+          }
+          ws.send(JSON.stringify(unSubRequest))
+        }
+      })
+      // sokcet close
+      ws.onclose = async () => {
+        // reconnect
+        ws = await startWebsocket()
+
         ws.onmessage = (message) => {
           let data = JSON.parse(message.data)
           store.dispatch('socket/addMessage', data)
         }
-        store.subscribe((mutation) => {
-          // create the channel string
-          if (mutation.type === 'socket/CREATE_CHANNEL_STRING') {
-            let subRequest = {
-              action: 'SubAdd',
-              subs: mutation.payload,
-            }
 
-            ws.send(JSON.stringify(subRequest))
-          }
-          // delete the channel string
-          if (mutation.type === 'socket/DELETE_CHANNEL_STRING') {
-            let unSubRequest = {
-              action: 'SubRemove',
-              subs: mutation.payload,
-            }
-            ws.send(JSON.stringify(unSubRequest))
-          }
-        })
-      })
-      .catch((err) => {
-        console.error(err)
-      })
+        let subRequest = {
+          action: 'SubAdd',
+          subs: store.getters['socket/displayChannelSting'],
+        }
+
+        ws.send(JSON.stringify(subRequest))
+      }
+    } catch (err) {
+      console.log(err)
+    }
   }
 }
 

@@ -14,6 +14,7 @@ export const getters = {
   displayOrderBook: (state) => state.order_book,
   displayTrade: (state) => state.trade,
   displayTicker: (state) => state.ticker,
+  displayChannelSting: (state) => state.channel_string,
 }
 
 export const mutations = {

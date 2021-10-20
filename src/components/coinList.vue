@@ -222,7 +222,7 @@ export default {
       return !this.search_coin
         ? this.c_filter_tab_list
         : filter(
-            this.assets_full_data,
+            this.c_filter_tab_list,
             (el) =>
               !this.search_coin ||
               `${el.FROMSYMBOL.toLowerCase()}/${el.TOSYMBOL.toLowerCase()}`.includes(
@@ -255,7 +255,6 @@ export default {
       setTimeout(() => {
         this.$store.commit('common/OFF_LOADING')
       }, 2000)
-      console.log(FSYM, TSYM)
       this.$store.dispatch('asset/updateSymbol', { FSYM, TSYM })
     },
     calculatePrice(price) {
