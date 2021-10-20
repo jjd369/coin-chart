@@ -1,0 +1,42 @@
+// el-layout
+.el-header,
+.el-footer {
+  background-color: #293335;
+  color: #91abaa;
+  text-align: center;
+  line-height: 60px;
+}
+body > .el-container {
+  margin-bottom: 40px;
+  background: #f9f9f9;
+}
+
+.el-container:nth-child(5) .el-aside,
+.el-container:nth-child(6) .el-aside {
+  line-height: 260px;
+}
+
+.el-container:nth-child(7) .el-aside {
+  line-height: 320px;
+}
+
+// el- icon
+.el-icon-star {
+  font-size: 18px;
+  margin-right: 6px;
+  color: #c0c4cc;
+  transition: 0.3s;
+}
+.el-icon-star::before {
+  content: '\e717';
+}
+.el-icon-star-on {
+  color: rgb(247, 186, 42);
+}
+.el-icon-star-on::before {
+  content: '\e797';
+}
+.el-icon-star:hover {
+  color: rgb(247, 186, 42);
+  transform: scale(1.15);
+}

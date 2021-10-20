@@ -1,5 +1,5 @@
 <template>
-  <div v-if="0" class="boxLine">
+  <div v-if="0" class="contentWrap">
     <div :class="$style.orderBookWrap">
       <!-- bid -->
       <div :class="$style.rightBox">

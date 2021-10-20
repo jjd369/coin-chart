@@ -1,0 +1,22 @@
+// coinlist
+.ps {
+  height: 465px;
+}
+.tabContent{
+  min-height: 500px;
+}
+.noContenteBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding-top: 100px;
+  line-height: 30px;
+}
+.searchBox {
+  margin-bottom: 20px;
+}
+// tvChartContainer
+.TVChartContainer {
+  height: 1062px;
+}

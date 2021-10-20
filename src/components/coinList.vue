@@ -1,29 +1,27 @@
 <template>
-  <div :class="$style.coinListWrap" class="boxLine">
-    <div :class="$style.searchWrap">
+  <div class="contentWrap">
+    <div class="searchBox">
       <el-input placeholder="search" v-model="search_coin"></el-input>
     </div>
     <el-tabs type="card" v-model="activeName" @tab-click="tabClick">
       <!-- 관심 목록 -->
       <el-tab-pane name="like">
         <span slot="label"><i class="el-icon-star el-icon-star-on"></i></span>
-        <div :class="$style.tabContentWrap">
-          <div v-if="!c_like_list.length">
-            <p :class="$style.noLikeList">관심 목록이 없습니다.</p>
-            <p :class="$style.noLikeList"
-              >별 아이콘을 눌러서 관심 목록에 추가해주세요.</p
-            >
+        <div class="tabContent">
+          <div v-if="!c_like_list.length" class="noContenteBox">
+            <p>관심 목록이 없습니다.</p>
+            <p>별 아이콘을 눌러서 관심 목록에 추가해주세요.</p>
           </div>
           <div v-else>
-            <div :class="$style.titleWrap">
+            <div class="titleWrap">
               <span>Pair</span>
               <span>Price</span>
               <span>Change</span>
             </div>
-            <ul :class="$style.contentWrap">
-              <perfect-scrollbar :class="$style.ps">
+            <ul>
+              <perfect-scrollbar>
                 <template v-for="(val, index) in c_like_list">
-                  <li :class="$style.listWrap" :key="index">
+                  <li class="listWrap" :key="index">
                     <div>
                       <i
                         :class="[
@@ -34,20 +32,18 @@
                       ></i>
                     </div>
                     <div
-                      :class="$style.listItem"
+                      class="listItem"
                       @click="changeAsset(val.FROMSYMBOL, val.TOSYMBOL)"
                     >
                       <span> {{ val.FROMSYMBOL }}/{{ val.TOSYMBOL }} </span>
-                      <span
-                        :class="val.FLAGS === '1' ? $style.green : $style.red"
-                      >
+                      <span :class="val.FLAGS === '1' ? 'green' : 'red'">
                         {{ calculatePrice(val.PRICE) }}
                       </span>
                       <span
                         :class="
                           calculateChangeDay(val.OPENDAY, val.PRICE) > 0
-                            ? $style.green
-                            : $style.red
+                            ? 'green'
+                            : 'red'
                         "
                         >{{
                           calculateChangeDay(val.OPENDAY, val.PRICE) + '%'
@@ -63,16 +59,16 @@
       </el-tab-pane>
       <!-- BTC -->
       <el-tab-pane label="BTC" name="BTC">
-        <div :class="$style.tabContentWrap">
-          <div :class="$style.titleWrap">
+        <div class="tabContent">
+          <div class="titleWrap">
             <span>Pair</span>
             <span>Price</span>
             <span>Change</span>
           </div>
-          <ul :class="$style.contentWrap">
-            <perfect-scrollbar :class="$style.ps">
+          <ul>
+            <perfect-scrollbar>
               <template v-for="(val, index) in c_filter_search_list">
-                <li :class="$style.listWrap" :key="index">
+                <li class="listWrap" :key="index">
                   <div>
                     <i
                       :class="[{ 'el-icon-star-on': val.like }, 'el-icon-star']"
@@ -80,20 +76,18 @@
                     ></i>
                   </div>
                   <div
-                    :class="$style.listItem"
+                    class="listItem"
                     @click="changeAsset(val.FROMSYMBOL, val.TOSYMBOL)"
                   >
                     <span> {{ val.FROMSYMBOL }}/{{ val.TOSYMBOL }} </span>
-                    <span
-                      :class="val.FLAGS === '1' ? $style.green : $style.red"
-                    >
+                    <span :class="val.FLAGS === '1' ? 'green' : 'red'">
                       {{ calculatePrice(val.PRICE) }}
                     </span>
                     <span
                       :class="
                         calculateChangeDay(val.OPENDAY, val.PRICE) > 0
-                          ? $style.green
-                          : $style.red
+                          ? 'green'
+                          : 'red'
                       "
                       >{{
                         calculateChangeDay(val.OPENDAY, val.PRICE) + '%'
@@ -108,16 +102,16 @@
       </el-tab-pane>
       <!-- ETH -->
       <el-tab-pane label="ETH" name="ETH">
-        <div :class="$style.tabContentWrap">
-          <div :class="$style.titleWrap">
+        <div class="tabContent">
+          <div class="titleWrap">
             <span>Pair</span>
             <span>Price</span>
             <span>Change</span>
           </div>
-          <ul :class="$style.contentWrap">
-            <perfect-scrollbar :class="$style.ps">
+          <ul>
+            <perfect-scrollbar>
               <template v-for="(val, index) in c_filter_search_list">
-                <li :class="$style.listWrap" :key="index">
+                <li class="listWrap" :key="index">
                   <div>
                     <i
                       :class="[{ 'el-icon-star-on': val.like }, 'el-icon-star']"
@@ -125,20 +119,18 @@
                     ></i>
                   </div>
                   <div
-                    :class="$style.listItem"
+                    class="listItem"
                     @click="changeAsset(val.FROMSYMBOL, val.TOSYMBOL)"
                   >
                     <span> {{ val.FROMSYMBOL }}/{{ val.TOSYMBOL }} </span>
-                    <span
-                      :class="val.FLAGS === '1' ? $style.green : $style.red"
-                    >
+                    <span :class="val.FLAGS === '1' ? 'green' : 'red'">
                       {{ calculatePrice(val.PRICE) }}
                     </span>
                     <span
                       :class="
                         calculateChangeDay(val.OPENDAY, val.PRICE) > 0
-                          ? $style.green
-                          : $style.red
+                          ? 'green'
+                          : 'red'
                       "
                       >{{
                         calculateChangeDay(val.OPENDAY, val.PRICE) + '%'
@@ -153,16 +145,16 @@
       </el-tab-pane>
       <!-- USDT -->
       <el-tab-pane label="USDT" name="USDT"
-        ><div :class="$style.tabContentWrap">
-          <div :class="$style.titleWrap">
+        ><div class="tabContent">
+          <div class="titleWrap">
             <span>Pair</span>
             <span>Price</span>
             <span>Change</span>
           </div>
-          <ul :class="$style.contentWrap">
-            <perfect-scrollbar :class="$style.ps">
+          <ul>
+            <perfect-scrollbar>
               <template v-for="(val, index) in c_filter_search_list">
-                <li :class="$style.listWrap" :key="index">
+                <li class="listWrap" :key="index">
                   <div>
                     <i
                       :class="[{ 'el-icon-star-on': val.like }, 'el-icon-star']"
@@ -170,20 +162,18 @@
                     ></i>
                   </div>
                   <div
-                    :class="$style.listItem"
+                    class="listItem"
                     @click="changeAsset(val.FROMSYMBOL, val.TOSYMBOL)"
                   >
                     <span> {{ val.FROMSYMBOL }}/{{ val.TOSYMBOL }} </span>
-                    <span
-                      :class="val.FLAGS === '1' ? $style.green : $style.red"
-                    >
+                    <span :class="val.FLAGS === '1' ? 'green' : 'red'">
                       {{ calculatePrice(val.PRICE) }}
                     </span>
                     <span
                       :class="
                         calculateChangeDay(val.OPENDAY, val.PRICE) > 0
-                          ? $style.green
-                          : $style.red
+                          ? 'green'
+                          : 'red'
                       "
                       >{{
                         calculateChangeDay(val.OPENDAY, val.PRICE) + '%'
@@ -269,7 +259,11 @@ export default {
       this.$store.dispatch('asset/updateSymbol', { FSYM, TSYM })
     },
     calculatePrice(price) {
-      return new Decimal(price).toFixed(8)
+      let calculate_price
+      this.activeName === 'USDT'
+        ? (calculate_price = new Decimal(price).toFixed(2))
+        : (calculate_price = new Decimal(price).toFixed(8))
+      return calculate_price
     },
     calculateChangeDay(openDay, price) {
       return Decimal.sub(price, openDay).div(openDay).mul(100).toFixed(2)
@@ -301,109 +295,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" module>
-.tabContentWrap {
-  min-height: 535px;
-
-  .noLikeList {
-    padding-top: 30px;
-  }
-  .ps {
-    height: 500px;
-  }
-}
-.coinListWrap {
-  .searchWrap {
-    margin-bottom: 20px;
-  }
-  padding: 10px;
-  margin-bottom: 20px;
-  .titleWrap {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    span {
-      display: flex;
-      &:nth-child(1) {
-        flex: 5 1 0px;
-        justify-content: flex-start;
-        min-width: 120px;
-      }
-      &:nth-child(2) {
-        flex: 3 1 0px;
-        justify-content: flex-end;
-        min-width: 50px;
-      }
-      &:nth-child(3) {
-        flex: 3 1 0px;
-        justify-content: flex-end;
-        min-width: 60px;
-      }
-    }
-  }
-  .listWrap {
-    display: flex;
-    align-items: center;
-    &:hover {
-      cursor: pointer;
-    }
-    padding: 0 5px 15px 5px;
-    .listItem {
-      display: flex;
-      flex: 1 1 0;
-      padding: 0 5px;
-    }
-    span {
-      display: flex;
-      &:nth-child(1) {
-        flex: 5 1 0px;
-        justify-content: flex-start;
-        min-width: 120px;
-      }
-      &:nth-child(2) {
-        flex: 3 1 0px;
-        justify-content: flex-end;
-        min-width: 50px;
-      }
-      &:nth-child(3) {
-        flex: 3 1 0px;
-        justify-content: flex-end;
-        min-width: 60px;
-      }
-    }
-    .green {
-      color: $green;
-    }
-    .red {
-      color: $red;
-    }
-  }
-}
-</style>
-<style>
-/* .ps {
-  height: 500px;
-} */
-</style>
-<style>
-.el-icon-star {
-  font-size: 18px;
-  margin-right: 6px;
-  color: #c0c4cc;
-  transition: 0.3s;
-}
-.el-icon-star::before {
-  content: '\e717';
-}
-.el-icon-star-on {
-  color: rgb(247, 186, 42);
-}
-.el-icon-star-on::before {
-  content: '\e797';
-}
-.el-icon-star:hover {
-  color: rgb(247, 186, 42);
-  transform: scale(1.15);
-}
-</style>

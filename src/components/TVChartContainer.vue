@@ -1,5 +1,5 @@
 <template>
-  <div class="chartWrap boxLine">
+  <div class="chartWrap contentWrap">
     <div class="TVChartContainer" :id="container_id" />
   </div>
 </template>
@@ -335,9 +335,6 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.TVChartContainer {
-  height: 1000px;
-}
 @media (max-width: 767px) {
   .TVChartContainer {
     height: 500px;

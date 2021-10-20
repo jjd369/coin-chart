@@ -1,25 +1,24 @@
 <template>
-  <div class="boxLine" :class="$style.tradeWrap">
-    <div :class="$style.titleWrap">
+  <div class="contentWrap">
+    <div class="titleWrap">
       <span>Price({{ TSYM }})</span>
       <span>Amount({{ FSYM }})</span>
       <span>Time</span>
     </div>
     <div>
-      <ul :class="$style.contentWrap">
-        <perfect-scrollbar :class="$style.ps">
+      <ul>
+        <perfect-scrollbar>
           <template v-for="(arr, index) in c_reverse_trade_list">
-            <li :key="index" :class="$style.listWrap">
-              <span
-                :class="[arr.F === '1' ? $style.red : $style.green]"
-                class="price"
-              >
-                {{ arr.P }}
-              </span>
-              <span>
-                {{ arr.Q }}
-              </span>
-              <span>{{ changeDateFormat(arr.TS) }}</span>
+            <li :key="index" class="listWrap">
+              <div class="listItem">
+                <span :class="[arr.F === '1' ? 'red' : 'green']" class="price">
+                  {{ arr.P }}
+                </span>
+                <span>
+                  {{ arr.Q }}
+                </span>
+                <span>{{ changeDateFormat(arr.TS) }}</span>
+              </div>
             </li>
           </template>
         </perfect-scrollbar>
@@ -71,72 +70,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" module>
-.tradeWrap {
-  min-height: 235px;
-  padding: 10px;
-  .ps {
-    height: 361px;
-  }
-}
-.titleWrap {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  span {
-    display: flex;
-    &:nth-child(1) {
-      flex: 5 1 0px;
-      justify-content: flex-start;
-      min-width: 120px;
-    }
-    &:nth-child(2) {
-      flex: 3 1 0px;
-      justify-content: flex-end;
-      min-width: 50px;
-    }
-    &:nth-child(3) {
-      flex: 3 1 0px;
-      justify-content: flex-end;
-      min-width: 60px;
-    }
-  }
-}
-.listWrap {
-  display: flex;
-  align-items: center;
-  padding: 0 5px 15px 5px;
-
-  &:hover {
-    cursor: pointer;
-  }
-  .price {
-    font-weight: 600;
-  }
-  span {
-    display: flex;
-    &:nth-child(1) {
-      flex: 5 1 0px;
-      justify-content: flex-start;
-      min-width: 120px;
-    }
-    &:nth-child(2) {
-      flex: 3 1 0px;
-      justify-content: flex-end;
-      min-width: 50px;
-    }
-    &:nth-child(3) {
-      flex: 3 1 0px;
-      justify-content: flex-end;
-      min-width: 60px;
-    }
-  }
-  .green {
-    color: $green;
-  }
-  .red {
-    color: $red;
-  }
-}
-</style>

@@ -1,35 +1,33 @@
 <template>
   <div>
-    <div :class="$style.mainBarWrap" class="boxLine">
-      <div :class="$style.row">
-        <div :class="$style.col">
+    <div class="contentWrap">
+      <div class="row">
+        <div class="col">
           <span>{{ FSYM }} / {{ TSYM }}</span>
-          <span :class="[trade.FLAGS === '1' ? $style.green : $style.red]">{{
+          <span :class="[trade.FLAGS === '1' ? 'green' : 'red']">{{
             trade.P
           }}</span>
         </div>
-        <div :class="$style.col">
+        <div class="col">
           <span>Change </span>
           <span
             :class="
-              calculateChangeDay(c_openDay, trade.P) > 0
-                ? $style.green
-                : $style.red
+              calculateChangeDay(c_openDay, trade.P) > 0 ? 'green' : 'red'
             "
             >{{ calculateChangeDay(c_openDay, trade.P) }}%</span
           >
         </div>
-        <div :class="$style.col"
+        <div class="col"
           ><span>24h High </span> <span>{{ c_compare_high }}</span></div
         >
-        <div :class="$style.col"
+        <div class="col"
           ><span>24h Low </span> <span>{{ c_compare_low }}</span></div
         >
-        <div :class="$style.col"
+        <div class="col"
           ><span>24h Volume({{ FSYM }}) </span>
           <span>{{ coin_info.VOLUME24HOUR }}</span></div
         >
-        <div :class="$style.col"
+        <div class="col"
           ><span>24h Volume({{ TSYM }}) </span>
           <span>{{ coin_info.VOLUME24HOURTO }}</span></div
         >
@@ -103,43 +101,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" module>
-.mainBarWrap {
-  display: flex;
-  padding: 15px;
-  margin-bottom: 20px;
-  .row {
-    display: flex;
-    flex-wrap: wrap;
-    .col {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      flex: 1 1 0;
-      padding-right: 30px;
-      line-height: 30px;
-      min-width: 100px;
-      &:nth-child(n + 5) {
-        min-width: 150px;
-      }
-      .green {
-        color: $green;
-      }
-      .red {
-        color: $red;
-      }
-    }
-  }
-}
-
-@media (max-width: 767px) {
-  .mainBarWrap {
-    .row {
-      .col {
-        padding-right: 0;
-      }
-    }
-  }
-}
-</style>
